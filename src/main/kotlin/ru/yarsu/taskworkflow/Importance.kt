@@ -1,4 +1,4 @@
-package ru.yarsu
+package ru.yarsu.taskworkflow
 
 enum class Importance(val importance: String) {
     VERYLOW("Очень низкий"),
