@@ -1,11 +1,13 @@
 package ru.yarsu
 
 import com.beust.jcommander.*
+import com.fasterxml.jackson.databind.SerializationFeature
 import java.util.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import ru.yarsu.taskworkflow.*
 import java.io.File
+
 
 fun main(argv: Array<String>) {
     val args = Args()
@@ -34,18 +36,6 @@ fun main(argv: Array<String>) {
         System.err.println("Don't have required arguments")
         return
     }
-    when (commander.parsedCommand){
-        "list" -> println("It's list command!")
-        "show" -> println("It's show command!")
-        "list-eisenhower" -> println("It's list-eisenhower command!")
-        "list-time" -> println("It's list-time command!")
-        "statistic" -> println("It's statistic command!")
-        else -> {
-            print("Dont under this command!")
-        }
-    }
-
-    val mapper = jacksonObjectMapper()
     val dataTask = mutableListOf<TaskModel>()
     for(item in data.drop(1)){
         dataTask.add(
@@ -54,8 +44,8 @@ fun main(argv: Array<String>) {
             title = item[1],
             registrationDateTime = item[2],
             startDateTime = item[3],
-            endDateTime = item[4] ?: "",
-            importance = Importance.LOW,      //ИСПРАВИТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            endDateTime = item[4],
+            importance = parseImportance(item[5]),
             urgency = item[6].toBoolean(),
             percentage = item[7].toInt(),
             description = item[8]
@@ -63,6 +53,16 @@ fun main(argv: Array<String>) {
         )
     }
     val workFlowWithTasks = WorkFlowWithTasks()
-    val jsonArray = mapper.writeValue(System.out,workFlowWithTasks.getTaskList(dataTask))
-    println(jsonArray)
+    val information: Any = when (commander.parsedCommand){
+        "list" -> workFlowWithTasks.getSortedTaskList(dataTask)
+        "show" -> println("It's show command!")
+        "list-eisenhower" -> println("It's list-eisenhower command!")
+        "list-time" -> println("It's list-time command!")
+        "statistic" -> println("It's statistic command!")
+        else -> {
+            print("Don't under this command!")
+        }
+    }
+    val mapper = jacksonObjectMapper()
+    mapper.enable(SerializationFeature.INDENT_OUTPUT).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
 }

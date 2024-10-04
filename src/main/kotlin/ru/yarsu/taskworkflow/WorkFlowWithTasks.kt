@@ -1,13 +1,29 @@
 package ru.yarsu.taskworkflow
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class WorkFlowWithTasks {
-    fun getTaskList(tasks: List<TaskModel>) : List<TaskModel>
+    fun getSortedTaskList(tasks: List<TaskModel>) : TaskList
     {
-//      val filtredTasks: List<TaskModel> = tasks.filter { LocalDate.parse(it.registrationDateTime)}
-        val sortedFilteredTasks = tasks.sortedBy { it.registrationDateTime }
-        return sortedFilteredTasks
+        val sortedFilteredTasks = tasks.sortedBy {LocalDateTime.parse(it.registrationDateTime)}
+
+        val totalSortedFilteredTaskList = mutableListOf<Tasks>()
+
+        sortedFilteredTasks.forEach({task ->
+            totalSortedFilteredTaskList.add(
+                Tasks(
+                    id = task.id,
+                    title = task.title,
+                    isClosed = task.percentage == 100
+                )
+            )
+        })
+
+        val viewTotalSortedFilteredTaskList: TaskList = TaskList(
+            totalSortedFilteredTaskList
+        )
+
+        return viewTotalSortedFilteredTaskList
     }
-    //Спарсить 3 и 4 - Начало задачи И Плановое окончание задачи
 }
