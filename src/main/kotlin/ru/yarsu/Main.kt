@@ -1,6 +1,8 @@
 package ru.yarsu
 
 import com.beust.jcommander.*
+import com.fasterxml.jackson.*
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.SerializationFeature
 import java.util.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -22,7 +24,7 @@ fun main(argv: Array<String>) {
         .addObject(args)
         .addCommand("list", taskList)
         .addCommand("show", showTask)
-        .addCommand("list-eisenhower", listEisenHower)
+        .addCommand("list-importance", listEisenHower)
         .addCommand("list-time", listTime)
         .addCommand("statistic", statistic)
         .build()
@@ -64,7 +66,9 @@ fun main(argv: Array<String>) {
                 System.err.println("Указан некорректный ID")
             }
         }
-        "list-eisenhower" -> println("It's list-eisenhower command!")
+        "list-importance" -> {
+            workFlowWithTasks.getListEisenHower(dataTask, listEisenHower.important, listEisenHower.urgent)
+        }
         "list-time" -> println("It's list-time command!")
         "statistic" -> println("It's statistic command!")
         else -> {
@@ -72,5 +76,5 @@ fun main(argv: Array<String>) {
         }
     }
     val mapper = jacksonObjectMapper()
-    mapper.enable(SerializationFeature.INDENT_OUTPUT).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
+    mapper.enable(SerializationFeature.INDENT_OUTPUT).setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
 }

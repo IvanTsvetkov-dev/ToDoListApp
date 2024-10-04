@@ -32,7 +32,7 @@ data class TaskModel(
     @JsonProperty("Description")
     val description: String
 )
-
+//Other views
 data class Tasks(
     @JsonProperty("ID")
     val id: UUID,
@@ -56,5 +56,34 @@ data class Task(
 
     @JsonProperty("task")
     val task: TaskModel
+)
+
+data class ListImportance(
+    @JsonProperty("important")
+    val important: Boolean?,
+
+    @JsonProperty("urgent")
+    val urgent: Boolean?,
+
+    @JsonProperty("tasks")
+    val tasks: List<TaskForListImportance>
+)
+
+data class TaskForListImportance(
+    @JsonProperty("Id")
+    val id: UUID,
+
+    @JsonProperty("Title")
+    val title: String,
+
+    @JsonProperty("Importance")
+    val importance: Importance,
+
+    @JsonProperty("Urgency")
+    val urgency: Boolean,
+
+    @JsonProperty("Percentage")
+    val percentage: Int,
+
 )
 
