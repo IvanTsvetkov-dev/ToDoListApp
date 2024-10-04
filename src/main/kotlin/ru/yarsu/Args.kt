@@ -1,6 +1,8 @@
 package ru.yarsu
 import com.beust.jcommander.*;
+import ru.yarsu.taskworkflow.Importance
 import java.util.*
+import kotlin.reflect.jvm.internal.ReflectProperties.Val
 
 @Parameters(separators = "=")
 class Args {
@@ -53,11 +55,20 @@ class Statistic{
         description = "Обязательный параметр типа отображаемой статистики",
         required = true
     )
-    var time: ValuesStatistic? = null
+    var valueStatistic: String? = null
 }
 
 enum class ValuesStatistic(val type: String){
     REGISTRATION(type = "registration"),
     START(type = "start"),
     END(type = "end")
+}
+
+fun parseValuesStatistic(type: String) : ValuesStatistic{
+    return when (type.lowercase()) {
+        "registration" -> ValuesStatistic.REGISTRATION
+        "start" -> ValuesStatistic.START
+        "end" -> ValuesStatistic.END
+        else -> throw IllegalArgumentException("Unknown importance: $type")
+    }
 }

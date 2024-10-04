@@ -81,11 +81,14 @@ fun main(argv: Array<String>) {
                 System.err.println("Указан некорректная дата. Шаблон: $dateFormat")
             }
         }
-        "statistic" -> println("It's statistic command!")
+        "statistic" -> {
+            workFlowWithTasks.getStatisticDate(dataTask, parseValuesStatistic(statistic.valueStatistic!!))
+        }
         else -> {
             print("Don't under this command!")
         }
     }
-    val mapper = jacksonObjectMapper()
-    mapper.enable(SerializationFeature.INDENT_OUTPUT).setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
+    println(information)
+//    val mapper = jacksonObjectMapper()
+//    mapper.enable(SerializationFeature.INDENT_OUTPUT).setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
 }

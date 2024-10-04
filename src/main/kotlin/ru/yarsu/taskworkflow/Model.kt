@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class TaskModel(
-
     @JsonProperty("ID")
     val id: UUID,
 
@@ -95,7 +94,5 @@ data class TaskForListTime(
     @JsonProperty("tasks")
     val tasks: List<TaskForListImportance>
 
-
-
-    )
+)
 

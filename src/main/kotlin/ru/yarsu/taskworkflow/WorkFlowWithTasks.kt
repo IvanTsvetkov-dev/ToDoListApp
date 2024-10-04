@@ -1,5 +1,6 @@
 package ru.yarsu.taskworkflow
 
+import ru.yarsu.ValuesStatistic
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -97,6 +98,23 @@ class WorkFlowWithTasks {
             tasks = taskList
         )
 
+    }
+
+    fun getStatisticDate(tasksData: List<TaskModel>, typeStatistic: ValuesStatistic) : Unit{
+        var dayCount: Map<String, Int> = mutableMapOf()
+        var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
+        when(typeStatistic) {
+            ValuesStatistic.REGISTRATION -> {
+
+            }
+            ValuesStatistic.START -> {
+                println("start")
+            }
+            ValuesStatistic.END ->{
+                println("end")
+            }
+            else -> println("l")
+        }
     }
 
 }
