@@ -1,4 +1,4 @@
-package ru.yarsu.taskworkflow
+package ru.yarsu
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.UUID
@@ -33,7 +33,9 @@ data class TaskModel(
     val description: String
 )
 //Other views
-data class Tasks(
+
+// view's for list command
+data class TasksForListCommand(
     @JsonProperty("ID")
     val id: UUID,
 
@@ -47,10 +49,11 @@ data class Tasks(
 
 data class TaskCommandList(
     @JsonProperty("tasks")
-    val tasks: List<Tasks>
+    val tasks: List<TasksForListCommand>
 )
 
-data class Task(
+//view for show command
+data class ParticularTask(
     @JsonProperty("task-id")
     val id: UUID,
 
@@ -58,6 +61,7 @@ data class Task(
     val task: TaskModel
 )
 
+//view's for list-eisenhower
 data class ListImportance(
     @JsonProperty("important")
     val important: Boolean?,
@@ -77,7 +81,7 @@ data class TaskForListImportance(
     val title: String,
 
     @JsonProperty("Importance")
-    val importance: Importance,
+    val importance: String,
 
     @JsonProperty("Urgency")
     val urgency: Boolean,
@@ -86,7 +90,7 @@ data class TaskForListImportance(
     val percentage: Int,
 
     )
-
+//view's for list-time
 data class TaskForListTime(
     @JsonProperty("time")
     val time: String,

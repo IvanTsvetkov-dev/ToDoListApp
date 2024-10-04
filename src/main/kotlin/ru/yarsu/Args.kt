@@ -5,11 +5,11 @@ import com.beust.jcommander.*;
 class Args {
     @Parameter(names = ["--tasks-file"],
         required = true,
-        description = "The csv file")
+        description = "Обязательный аргумент, принимает путь к csv файлу с данными")
     var urlFile: String = ""
 }
 
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Выводит информацию о задаче по её UUID")
 class ShowTask{
     @Parameter(names = ["--task-id"],
         arity = 1,
@@ -20,7 +20,7 @@ class ShowTask{
 
 class TaskList {}
 
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Получить список задач для блока Матрицы Эйзенхауэра")
 class ListEisenHower{
     @Parameter(names = ["--important"],
         arity = 1,
@@ -35,7 +35,7 @@ class ListEisenHower{
     var urgent: Boolean? = null
 }
 
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Получить список задач, актуальных на момент времени")
 class ListTime{
     @Parameter(names = ["--time"],
         arity = 1,
@@ -45,7 +45,7 @@ class ListTime{
     var time: String? = null
 }
 
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Получить статистическую информацию о списке задач по дням недели")
 class Statistic{
     @Parameter(names = ["--by-date"],
         arity = 1,
@@ -55,17 +55,3 @@ class Statistic{
     var valueStatistic: String? = null
 }
 
-enum class ValuesStatistic(val type: String){
-    REGISTRATION(type = "registration"),
-    START(type = "start"),
-    END(type = "end")
-}
-
-fun parseValuesStatistic(type: String) : ValuesStatistic{
-    return when (type.lowercase()) {
-        "registration" -> ValuesStatistic.REGISTRATION
-        "start" -> ValuesStatistic.START
-        "end" -> ValuesStatistic.END
-        else -> throw IllegalArgumentException("Unknown importance: $type")
-    }
-}

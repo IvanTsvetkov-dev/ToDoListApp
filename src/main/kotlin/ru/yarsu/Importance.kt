@@ -1,6 +1,6 @@
-package ru.yarsu.taskworkflow
+package ru.yarsu
 
-enum class Importance(val importance: String, val order: Int) {
+enum class Importance(var importance: String, val order: Int) {
     VERYLOW("очень низкий", 0),
     LOW("низкий", 1),
     DEFAULT("обычный", 2),

@@ -1,27 +1,28 @@
-package ru.yarsu.taskworkflow
+package ru.yarsu
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-import ru.yarsu.ValuesStatistic
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.mutableListOf as mutableListOf
 
 class WorkFlowWithTasks(
-    var tasksData: List<TaskModel>
+    val tasksData: List<TaskModel>
 ) {
     fun getSortedTaskList() : TaskCommandList
     {
         val sortedFilteredTasks = tasksData.sortedBy {LocalDateTime.parse(it.registrationDateTime)}
 
-        val totalSortedFilteredTaskList = mutableListOf<Tasks>()
+        val totalSortedFilteredTaskList = mutableListOf<TasksForListCommand>()
 
-        sortedFilteredTasks.forEach({task ->
+        sortedFilteredTasks.forEach(
+            {
+            task ->
             totalSortedFilteredTaskList.add(
-                Tasks(
+                TasksForListCommand(
                     id = task.id,
                     title = task.title,
                     isClosed = task.percentage == 100
@@ -35,13 +36,13 @@ class WorkFlowWithTasks(
 
         return viewTotalSortedFilteredTaskList
     }
-    fun getTaskById(id: UUID) : Task
+    fun getTaskById(id: UUID) : ParticularTask
     {
         var taskById = tasksData.find { it.id == id }
         if (taskById == null){
-            throw NullPointerException()
+            throw NullPointerException("Задание с таким id не найдено!")
         }
-        return Task(
+        return ParticularTask(
             id = id,
             task = taskById
         )
@@ -50,11 +51,7 @@ class WorkFlowWithTasks(
         val filteredTasks = tasksData.filter { task ->
             (important == null ||
                     (important && task.importance in listOf(Importance.HIGH, Importance.VERYHIGH, Importance.CRITICAL)) ||
-                    (important == false && task.importance in listOf(
-                        Importance.VERYLOW,
-                        Importance.LOW,
-                        Importance.DEFAULT
-                    ))) &&
+                    (important == false && task.importance in listOf(Importance.VERYLOW, Importance.LOW, Importance.DEFAULT))) &&
                     (urgent == null || task.urgency == urgent)
         }
         val taskForListImportance = mutableListOf<TaskForListImportance>()
@@ -63,7 +60,7 @@ class WorkFlowWithTasks(
                 TaskForListImportance(
                     id = task.id,
                     title = task.title,
-                    importance = task.importance,
+                    importance = task.importance.importance,
                     urgency = task.urgency,
                     percentage = task.percentage
                 )
@@ -76,7 +73,7 @@ class WorkFlowWithTasks(
             tasks = taskForListImportance
         )
     }
-    fun getSotrtedListByManyParametresTask(inputDateTime: LocalDateTime) : TaskForListTime {
+    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime) : TaskForListTime {
         var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
         val listSorted = tasksData.filter { task ->
             val taskStartDateTime = LocalDateTime.parse(task.startDateTime, format)
@@ -95,7 +92,7 @@ class WorkFlowWithTasks(
                 TaskForListImportance(
                     id = task.id,
                     title = task.title,
-                    importance = task.importance,
+                    importance = task.importance.importance,
                     urgency = task.urgency,
                     percentage = task.percentage
                 )
@@ -108,6 +105,7 @@ class WorkFlowWithTasks(
         )
 
     }
+
 
     fun getStatisticDate(typeStatistic: ValuesStatistic) : Unit {
         val dayCount: MutableMap<String, Int> = mutableMapOf()

@@ -8,11 +8,10 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.util.*
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
-import ru.yarsu.taskworkflow.*
 import java.io.File
-import java.io.FileNotFoundException
 import java.time.LocalDateTime
 import java.time.format.*
+import kotlin.system.exitProcess
 
 fun main(argv: Array<String>) {
     val args = Args()
@@ -32,67 +31,71 @@ fun main(argv: Array<String>) {
         .addCommand("statistic", statistic)
         .build()
 
-    val data: List<List<String>>
-    try{
+    val dataForView: Any
+    try {
+        val data: List<List<String>>
         commander.parse(*argv)
         val csvReader = CsvReader()
         data = csvReader.readAll(File(args.urlFile))
-    } catch (e: ParameterException){
-        System.err.println("Не указан обязательный аргумент!")
-        return
-    } catch (e: FileNotFoundException){
-        System.err.println("Файл не существует!")
-        return
-    }
 
-    val dataTask = mutableListOf<TaskModel>()
-    for(item in data.drop(1)){
-        dataTask.add(
-            TaskModel(
-            UUID.fromString(item[0]),
-            title = item[1],
-            registrationDateTime = item[2],
-            startDateTime = item[3],
-            endDateTime = item[4],
-            importance = parseImportance(item[5]),
-            urgency = item[6].toBoolean(),
-            percentage = item[7].toInt(),
-            description = item[8]
+        val dataTask = mutableListOf<TaskModel>()
+        for (item in data.drop(1)) {
+            dataTask.add(
+                TaskModel(
+                    UUID.fromString(item[0]),
+                    title = item[1],
+                    registrationDateTime = item[2],
+                    startDateTime = item[3],
+                    endDateTime = item[4],
+                    importance = parseImportance(item[5]),
+                    urgency = item[6].toBoolean(),
+                    percentage = item[7].toInt(),
+                    description = item[8]
+                )
             )
-        )
-    }
-    val workFlowWithTasks = WorkFlowWithTasks(dataTask)
-    val information: Any = when (commander.parsedCommand){
-        "list" -> workFlowWithTasks.getSortedTaskList()
-        "show" -> {
-            try {
+        }
+        val workFlowWithTasks = WorkFlowWithTasks(dataTask)
+        dataForView = when (commander.parsedCommand) {
+            "list" -> workFlowWithTasks.getSortedTaskList()
+            "show" -> {
                 workFlowWithTasks.getTaskById(UUID.fromString(showTask.taskID))
-            } catch (e: NullPointerException){
-                System.err.println("Запись с таким ID не найдена")
-            } catch (e: IllegalArgumentException){
                 System.err.println("Указан некорректный ID")
             }
-        }
-        "list-importance" -> {
-            workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
-        }
-        "list-time" -> {
-            val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
-            val format = DateTimeFormatter.ofPattern(dateFormat)
-            try{
-                workFlowWithTasks.getSotrtedListByManyParametresTask(LocalDateTime.parse(listTime.time!!, format))
-            }catch (e: DateTimeParseException){
-                System.err.println("Указан некорректная дата. Шаблон: $dateFormat")
+
+            "list-importance" -> {
+                workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
+            }
+
+            "list-time" -> {
+                val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
+                val format = DateTimeFormatter.ofPattern(dateFormat)
+                if(listTime.time == null){
+                    throw NullPointerException("Дата не может быть нулевой")
+                }
+                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time, format))
+
+            }
+
+            "statistic" -> {
+                val valueStatic: String = statistic.valueStatistic
+                    ?: throw NullPointerException("ValueStatic нее может быть равным null")
+                workFlowWithTasks.getStatisticDate(parseValuesStatistic(valueStatic))
+                return
+            }
+
+            else -> {
+                println("Не передана ни одна команда!Документация:")
+                commander.usage()
+                return
             }
         }
-        "statistic" -> {
-            workFlowWithTasks.getStatisticDate(parseValuesStatistic(statistic.valueStatistic!!))
-            return
-        }
-        else -> {
-            print("Don't under this command!")
-        }
     }
+    catch (e: Exception){
+        System.err.println("Ошибка! Приложение использовано некорретно. Читайте документацию! Подробности ошибки: $e")
+        commander.usage()
+        exitProcess(1)
+    }
+
     //Вывод для высокоуровневого интерфейса
     val mapper = jacksonObjectMapper()
     val printer = DefaultPrettyPrinter()
@@ -100,5 +103,5 @@ fun main(argv: Array<String>) {
     mapper.enable(SerializationFeature.INDENT_OUTPUT)
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
         .writer(printer)
-        .writeValue(System.out, information)
+        .writeValue(System.out, dataForView)
 }
