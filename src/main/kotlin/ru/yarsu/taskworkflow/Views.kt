@@ -1,9 +1,9 @@
 package ru.yarsu.taskworkflow
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.time.LocalDateTime
 import java.util.UUID
 
+//Basic view
 data class TaskModel(
     @JsonProperty("ID")
     val id: UUID,
@@ -45,7 +45,7 @@ data class Tasks(
 
 )
 
-data class TaskList(
+data class TaskCommandList(
     @JsonProperty("tasks")
     val tasks: List<Tasks>
 )
@@ -85,7 +85,7 @@ data class TaskForListImportance(
     @JsonProperty("Percentage")
     val percentage: Int,
 
-)
+    )
 
 data class TaskForListTime(
     @JsonProperty("time")

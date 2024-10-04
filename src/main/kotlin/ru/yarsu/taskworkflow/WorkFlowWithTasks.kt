@@ -1,14 +1,19 @@
 package ru.yarsu.taskworkflow
 
+import com.fasterxml.jackson.core.JsonFactory
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.util.DefaultIndenter
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import ru.yarsu.ValuesStatistic
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.mutableListOf as mutableListOf
 
-class WorkFlowWithTasks {
-    fun getSortedTaskList(tasksData: List<TaskModel>) : TaskList
+class WorkFlowWithTasks(
+    var tasksData: List<TaskModel>
+) {
+    fun getSortedTaskList() : TaskCommandList
     {
         val sortedFilteredTasks = tasksData.sortedBy {LocalDateTime.parse(it.registrationDateTime)}
 
@@ -24,13 +29,13 @@ class WorkFlowWithTasks {
             )
         })
 
-        val viewTotalSortedFilteredTaskList: TaskList = TaskList(
+        val viewTotalSortedFilteredTaskList: TaskCommandList = TaskCommandList(
             totalSortedFilteredTaskList
         )
 
         return viewTotalSortedFilteredTaskList
     }
-    fun getTaskById(tasksData: List<TaskModel>, id: UUID) : Task
+    fun getTaskById(id: UUID) : Task
     {
         var taskById = tasksData.find { it.id == id }
         if (taskById == null){
@@ -41,11 +46,15 @@ class WorkFlowWithTasks {
             task = taskById
         )
     }
-    fun getListEisenHower(tasksData: List<TaskModel>, important: Boolean?, urgent: Boolean?) : ListImportance{
+    fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
         val filteredTasks = tasksData.filter { task ->
             (important == null ||
                     (important && task.importance in listOf(Importance.HIGH, Importance.VERYHIGH, Importance.CRITICAL)) ||
-                    (important == false && task.importance in listOf(Importance.VERYLOW, Importance.LOW, Importance.DEFAULT))) &&
+                    (important == false && task.importance in listOf(
+                        Importance.VERYLOW,
+                        Importance.LOW,
+                        Importance.DEFAULT
+                    ))) &&
                     (urgent == null || task.urgency == urgent)
         }
         val taskForListImportance = mutableListOf<TaskForListImportance>()
@@ -67,7 +76,7 @@ class WorkFlowWithTasks {
             tasks = taskForListImportance
         )
     }
-    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime) : TaskForListTime{
+    fun getSotrtedListByManyParametresTask(inputDateTime: LocalDateTime) : TaskForListTime {
         var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
         val listSorted = tasksData.filter { task ->
             val taskStartDateTime = LocalDateTime.parse(task.startDateTime, format)
@@ -100,20 +109,70 @@ class WorkFlowWithTasks {
 
     }
 
-    fun getStatisticDate(tasksData: List<TaskModel>, typeStatistic: ValuesStatistic) : Unit{
-        var dayCount: Map<String, Int> = mutableMapOf()
-        var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
-        when(typeStatistic) {
-            ValuesStatistic.REGISTRATION -> {
+    fun getStatisticDate(typeStatistic: ValuesStatistic) : Unit {
+        val dayCount: MutableMap<String, Int> = mutableMapOf()
+        val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
 
+        val dayOfWeekTranslations = mapOf(
+            "MONDAY" to "Понедельник",
+            "TUESDAY" to "Вторник",
+            "WEDNESDAY" to "Среда",
+            "THURSDAY" to "Четверг",
+            "FRIDAY" to "Пятница",
+            "SATURDAY" to "Суббота",
+            "SUNDAY" to "Воскресенье"
+        )
+
+        val weekDaysOrder = listOf(
+            "Понедельник", "Вторник", "Среда", "Четверг",
+            "Пятница", "Суббота", "Воскресенье", "Не заполнено"
+        )
+
+        for (task in tasksData) {
+            val dateString = when (typeStatistic) {
+                ValuesStatistic.REGISTRATION -> task.registrationDateTime
+                ValuesStatistic.START -> task.startDateTime
+                ValuesStatistic.END -> task.endDateTime ?: ""
             }
-            ValuesStatistic.START -> {
-                println("start")
+
+            if (dateString.isNotEmpty()) {
+                val date = LocalDateTime.parse(dateString, format)
+                val dayOfWeek = dayOfWeekTranslations[date.dayOfWeek.name] ?: date.dayOfWeek.name
+                dayCount[dayOfWeek] = dayCount.getOrDefault(dayOfWeek, 0) + 1
+            } else if (typeStatistic == ValuesStatistic.END) {
+                dayCount["Не заполнено"] = dayCount.getOrDefault("Не заполнено", 0) + 1
             }
-            ValuesStatistic.END ->{
-                println("end")
+        }
+
+        val factory: JsonFactory = JsonFactory()
+        val outputGenerator: JsonGenerator = factory.createGenerator(System.out)
+        val printer = DefaultPrettyPrinter()
+        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+        outputGenerator.prettyPrinter = printer
+
+        with(outputGenerator) {
+            writeStartObject()
+
+            writeFieldName(when(typeStatistic){
+                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
+                ValuesStatistic.START -> "statisticByStartDateTime"
+                ValuesStatistic.END -> "statisticByEndDateTime"
+            })
+
+            writeStartArray()
+
+            for (day in weekDaysOrder) {
+                dayCount[day]?.let { count ->
+                    writeStartObject()
+                    writeFieldName(day)
+                    writeNumber(count)
+                    writeEndObject()
+                }
             }
-            else -> println("l")
+            writeEndArray()
+
+            writeEndObject()
+            close()
         }
     }
 

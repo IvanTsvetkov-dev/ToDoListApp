@@ -1,18 +1,18 @@
 package ru.yarsu
 
 import com.beust.jcommander.*
-import com.fasterxml.jackson.*
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.core.util.DefaultIndenter
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
-import java.util.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import java.util.*
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import ru.yarsu.taskworkflow.*
 import java.io.File
+import java.io.FileNotFoundException
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-
+import java.time.format.*
 
 fun main(argv: Array<String>) {
     val args = Args()
@@ -32,15 +32,19 @@ fun main(argv: Array<String>) {
         .addCommand("statistic", statistic)
         .build()
 
-    var data: List<List<String>> = listOf()
+    val data: List<List<String>>
     try{
         commander.parse(*argv)
         val csvReader = CsvReader()
-        data = csvReader.readAll(File(args.urlFile!!))
+        data = csvReader.readAll(File(args.urlFile))
     } catch (e: ParameterException){
-        System.err.println("Don't have required arguments")
+        System.err.println("Не указан обязательный аргумент!")
+        return
+    } catch (e: FileNotFoundException){
+        System.err.println("Файл не существует!")
         return
     }
+
     val dataTask = mutableListOf<TaskModel>()
     for(item in data.drop(1)){
         dataTask.add(
@@ -57,12 +61,12 @@ fun main(argv: Array<String>) {
             )
         )
     }
-    val workFlowWithTasks = WorkFlowWithTasks()
+    val workFlowWithTasks = WorkFlowWithTasks(dataTask)
     val information: Any = when (commander.parsedCommand){
-        "list" -> workFlowWithTasks.getSortedTaskList(dataTask)
+        "list" -> workFlowWithTasks.getSortedTaskList()
         "show" -> {
             try {
-                workFlowWithTasks.getTaskById(dataTask, UUID.fromString(showTask.taskID))
+                workFlowWithTasks.getTaskById(UUID.fromString(showTask.taskID))
             } catch (e: NullPointerException){
                 System.err.println("Запись с таким ID не найдена")
             } catch (e: IllegalArgumentException){
@@ -70,25 +74,31 @@ fun main(argv: Array<String>) {
             }
         }
         "list-importance" -> {
-            workFlowWithTasks.getListEisenHower(dataTask, listEisenHower.important, listEisenHower.urgent)
+            workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
         }
         "list-time" -> {
             val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
             val format = DateTimeFormatter.ofPattern(dateFormat)
             try{
-                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time!!, format))
+                workFlowWithTasks.getSotrtedListByManyParametresTask(LocalDateTime.parse(listTime.time!!, format))
             }catch (e: DateTimeParseException){
                 System.err.println("Указан некорректная дата. Шаблон: $dateFormat")
             }
         }
         "statistic" -> {
-            workFlowWithTasks.getStatisticDate(dataTask, parseValuesStatistic(statistic.valueStatistic!!))
+            workFlowWithTasks.getStatisticDate(parseValuesStatistic(statistic.valueStatistic!!))
+            return
         }
         else -> {
             print("Don't under this command!")
         }
     }
-    println(information)
-//    val mapper = jacksonObjectMapper()
-//    mapper.enable(SerializationFeature.INDENT_OUTPUT).setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter().writeValue(System.out, information)
+    //Вывод для высокоуровневого интерфейса
+    val mapper = jacksonObjectMapper()
+    val printer = DefaultPrettyPrinter()
+    printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+    mapper.enable(SerializationFeature.INDENT_OUTPUT)
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        .writer(printer)
+        .writeValue(System.out, information)
 }

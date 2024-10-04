@@ -1,15 +1,12 @@
 package ru.yarsu
 import com.beust.jcommander.*;
-import ru.yarsu.taskworkflow.Importance
-import java.util.*
-import kotlin.reflect.jvm.internal.ReflectProperties.Val
 
 @Parameters(separators = "=")
 class Args {
     @Parameter(names = ["--tasks-file"],
         required = true,
         description = "The csv file")
-    var urlFile: String? = ""
+    var urlFile: String = ""
 }
 
 @Parameters(separators = "=")
