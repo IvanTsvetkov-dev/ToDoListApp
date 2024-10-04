@@ -55,7 +55,15 @@ fun main(argv: Array<String>) {
     val workFlowWithTasks = WorkFlowWithTasks()
     val information: Any = when (commander.parsedCommand){
         "list" -> workFlowWithTasks.getSortedTaskList(dataTask)
-        "show" -> println("It's show command!")
+        "show" -> {
+            try {
+                workFlowWithTasks.getTaskById(dataTask, UUID.fromString(showTask.taskID))
+            } catch (e: NullPointerException){
+                System.err.println("Запись с таким ID не найдена")
+            } catch (e: IllegalArgumentException){
+                System.err.println("Указан некорректный ID")
+            }
+        }
         "list-eisenhower" -> println("It's list-eisenhower command!")
         "list-time" -> println("It's list-time command!")
         "statistic" -> println("It's statistic command!")

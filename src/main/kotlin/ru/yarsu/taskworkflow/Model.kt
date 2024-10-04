@@ -50,3 +50,11 @@ data class TaskList(
     val tasks: List<Tasks>
 )
 
+data class Task(
+    @JsonProperty("task-id")
+    val id: UUID,
+
+    @JsonProperty("task")
+    val task: TaskModel
+)
+

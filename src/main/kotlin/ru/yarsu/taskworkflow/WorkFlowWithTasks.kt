@@ -2,6 +2,7 @@ package ru.yarsu.taskworkflow
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 class WorkFlowWithTasks {
     fun getSortedTaskList(tasks: List<TaskModel>) : TaskList
@@ -25,5 +26,16 @@ class WorkFlowWithTasks {
         )
 
         return viewTotalSortedFilteredTaskList
+    }
+    fun getTaskById(tasksData: List<TaskModel>, id: UUID) : Task
+    {
+        var taskById = tasksData.find { it.id == id }
+        if (taskById == null){
+            throw NullPointerException()
+        }
+        return Task(
+            id = id,
+            task = taskById
+        )
     }
 }
