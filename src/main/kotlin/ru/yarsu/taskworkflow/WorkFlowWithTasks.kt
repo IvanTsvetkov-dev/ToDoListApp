@@ -2,6 +2,7 @@ package ru.yarsu.taskworkflow
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.mutableListOf as mutableListOf
 
@@ -65,4 +66,37 @@ class WorkFlowWithTasks {
             tasks = taskForListImportance
         )
     }
+    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime) : TaskForListTime{
+        var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
+        val listSorted = tasksData.filter { task ->
+            val taskStartDateTime = LocalDateTime.parse(task.startDateTime, format)
+            val taskregistrationDateTime = LocalDateTime.parse(task.registrationDateTime, format)
+            taskStartDateTime.isBefore(inputDateTime) && taskregistrationDateTime.isBefore(inputDateTime) && task.percentage < 100
+        }.sortedWith(                                              //sortedWith принимает собственный Comparator
+            compareByDescending<TaskModel> { it.importance.order } //убывание важности
+                .thenByDescending { it.urgency }
+                .thenBy { LocalDateTime.parse(it.registrationDateTime, format) }
+                .thenBy { it.id }
+        )
+
+        val taskList = mutableListOf<TaskForListImportance>()
+        listSorted.forEach({task ->
+            taskList.add(
+                TaskForListImportance(
+                    id = task.id,
+                    title = task.title,
+                    importance = task.importance,
+                    urgency = task.urgency,
+                    percentage = task.percentage
+                )
+            )
+        })
+
+        return TaskForListTime(
+            time = inputDateTime.toString(),
+            tasks = taskList
+        )
+
+    }
+
 }

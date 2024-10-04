@@ -9,6 +9,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import ru.yarsu.taskworkflow.*
 import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 
 fun main(argv: Array<String>) {
@@ -69,7 +72,15 @@ fun main(argv: Array<String>) {
         "list-importance" -> {
             workFlowWithTasks.getListEisenHower(dataTask, listEisenHower.important, listEisenHower.urgent)
         }
-        "list-time" -> println("It's list-time command!")
+        "list-time" -> {
+            val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
+            val format = DateTimeFormatter.ofPattern(dateFormat)
+            try{
+                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time!!, format))
+            }catch (e: DateTimeParseException){
+                System.err.println("Указан некорректная дата. Шаблон: $dateFormat")
+            }
+        }
         "statistic" -> println("It's statistic command!")
         else -> {
             print("Don't under this command!")

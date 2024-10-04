@@ -1,12 +1,12 @@
 package ru.yarsu.taskworkflow
 
-enum class Importance(val importance: String) {
-    VERYLOW("очень низкий"),
-    LOW("низкий"),
-    DEFAULT("обычный"),
-    HIGH("высокий"),
-    VERYHIGH("очень высокий"),
-    CRITICAL("критический")
+enum class Importance(val importance: String, val order: Int) {
+    VERYLOW("очень низкий", 0),
+    LOW("низкий", 1),
+    DEFAULT("обычный", 2),
+    HIGH("высокий", 3),
+    VERYHIGH("очень высокий", 4),
+    CRITICAL("критический", 5)
 
 }
 fun parseImportance(importanceString: String): Importance {
