@@ -14,21 +14,21 @@ import java.time.format.*
 import kotlin.system.exitProcess
 
 fun main(argv: Array<String>) {
-    val args = Args()
     val showTask = ShowTask()
     val taskList = TaskList()
     val listEisenHower = ListEisenHower()
     val listTime = ListTime()
     val statistic = Statistic()
+    val statisticByHowReady = StatisticByHowReady()
 
     val commander: JCommander = JCommander
         .newBuilder()
-        .addObject(args)
         .addCommand("list", taskList)
         .addCommand("show", showTask)
         .addCommand("list-importance", listEisenHower)
         .addCommand("list-time", listTime)
         .addCommand("statistic", statistic)
+        .addCommand("statistic-by-how-ready", statisticByHowReady)
         .build()
 
     val dataForView: Any
@@ -36,7 +36,22 @@ fun main(argv: Array<String>) {
         val data: List<List<String>>
         commander.parse(*argv)
         val csvReader = CsvReader()
-        data = csvReader.readAll(File(args.urlFile))
+        data = when{
+            taskList.urlFile != "" -> csvReader.readAll(File(taskList.urlFile))
+            showTask.urlFile != "" -> csvReader.readAll(File(showTask.urlFile))
+            listEisenHower.urlFile != "" -> csvReader.readAll(File(listEisenHower.urlFile))
+            listTime.urlFile != "" -> csvReader.readAll(File(listTime.urlFile))
+            statistic.urlFile != "" -> csvReader.readAll(File(statistic.urlFile))
+            statisticByHowReady.statisticByHowReadyFile != "" -> {
+                if (argv.contains("--tasks-file")){
+                    throw IllegalArgumentException("--tasks-file не должен указываться!")
+                }
+                csvReader.readAll(File(statisticByHowReady.statisticByHowReadyFile))
+            }
+            else -> {
+                throw IllegalArgumentException("Пропущен аргумент")
+            }
+        }
 
         val dataTask = mutableListOf<TaskModel>()
         for (item in data.drop(1)) {
@@ -59,7 +74,6 @@ fun main(argv: Array<String>) {
             "list" -> workFlowWithTasks.getSortedTaskList()
             "show" -> {
                 workFlowWithTasks.getTaskById(UUID.fromString(showTask.taskID))
-                System.err.println("Указан некорректный ID")
             }
 
             "list-importance" -> {
@@ -83,14 +97,18 @@ fun main(argv: Array<String>) {
                 return
             }
 
+            "statistic-by-how-ready" -> {
+                workFlowWithTasks.getStatisticByHowReady()
+                return
+            }
+
             else -> {
                 println("Не передана ни одна команда!Документация:")
                 commander.usage()
                 return
             }
         }
-    }
-    catch (e: Exception){
+    } catch (e: Exception){
         System.err.println("Ошибка! Приложение использовано некорретно. Читайте документацию! Подробности ошибки: $e")
         commander.usage()
         exitProcess(1)

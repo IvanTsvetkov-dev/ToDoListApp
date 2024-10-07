@@ -173,5 +173,81 @@ class WorkFlowWithTasks(
             close()
         }
     }
+    fun getStatisticByHowReady() : Unit{
+        val statisticCount: MutableMap<String, Int> = mutableMapOf()
+        val statisticStatus = listOf(
+            "готова", "почти готова", "в процессе", "немного начата",
+            "не начата"
+        )
+        for(task in tasksData){
+            when(task.percentage){
+                100 -> {
+                    if(!statisticCount.containsKey("готова")){
+                        statisticCount["готова"] = 1
+                    }else{
+                        val value = statisticCount.getValue("готова") + 1
+                        statisticCount["готова"] = value
+                    }
+                }
+                in 85..99 ->{
+                    if(!statisticCount.containsKey("почти готова")){
+                        statisticCount["почти готова"] = 1
+                    }else{
+                        val value = statisticCount.getValue("почти готова") + 1
+                        statisticCount["почти готова"] = value
+                    }
+                }
+                in 16..84 ->{
+                    if(!statisticCount.containsKey("в процессе")){
+                        statisticCount["в процессе"] = 1
+                    } else{
+                        val value = statisticCount.getValue("в процессе") + 1
+                        statisticCount["в процессе"] = value
+                    }
+                }
+                in 1..14 -> {
+                    if(!statisticCount.containsKey("немного начата")){
+                        statisticCount["немного начата"] = 1
+                    } else{
+                    val value = statisticCount.getValue("немного начата") + 1
+                        statisticCount["немного начата"] = value
+                    }
+                }
+                else -> {
+                    if(!statisticCount.containsKey("не начата")){
+                        statisticCount["не начата"] = 1
+                    } else{
+                        val value = statisticCount.getValue("не начата") + 1
+                        statisticCount["не начата"] = value
+                    }
+                }
+
+            }
+        }
+        val factory: JsonFactory = JsonFactory()
+        val outputGenerator: JsonGenerator = factory.createGenerator(System.out)
+        val printer = DefaultPrettyPrinter()
+        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+        outputGenerator.prettyPrinter = printer
+
+        with(outputGenerator) {
+            writeStartObject()
+
+            writeFieldName("statisticByHowReady")
+
+            writeStartObject()
+            for (statistic in statisticStatus) {
+                statisticCount[statistic]?.let { count ->
+                    writeFieldName(statistic)
+                    writeNumber(count)
+                }
+            }
+            writeEndObject()
+
+            writeEndObject()
+            close()
+        }
+
+    }
 
 }
