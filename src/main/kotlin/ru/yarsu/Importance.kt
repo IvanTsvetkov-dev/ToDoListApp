@@ -1,22 +1,19 @@
 package ru.yarsu
 
-enum class Importance(var importance: String, val order: Int) {
-    VERYLOW("очень низкий", 0),
-    LOW("низкий", 1),
-    DEFAULT("обычный", 2),
-    HIGH("высокий", 3),
-    VERYHIGH("очень высокий", 4),
-    CRITICAL("критический", 5)
+enum class Importance(var importance: String) {
+    VERYLOW("очень низкий"),
+    LOW("низкий"),
+    DEFAULT("обычный"),
+    HIGH("высокий"),
+    VERYHIGH("очень высокий"),
+    CRITICAL("критический")
 
 }
-fun parseImportance(importanceString: String): Importance {
-    return when (importanceString.lowercase()) {
-        "очень низкий" -> Importance.VERYLOW
-        "низкий" -> Importance.LOW
-        "обычный" -> Importance.DEFAULT
-        "высокий" -> Importance.HIGH
-        "очень высокий" -> Importance.VERYHIGH
-        "критический" -> Importance.CRITICAL
-        else -> throw IllegalArgumentException("Unknown importance: $importanceString")
+fun parseImportance(importanceString: String): String {
+    for(importance in Importance.entries){
+        if(importanceString == importance.importance){
+            return importanceString
+        }
     }
+    throw IllegalArgumentException("Неизвестный Importance. Может быть только очень низкий, низкий, обычный, высокий, очень высокий, критический")
 }

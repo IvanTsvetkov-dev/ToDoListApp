@@ -30,12 +30,12 @@ fun main(argv: Array<String>) {
         .addCommand("statistic", statistic)
         .addCommand("statistic-by-how-ready", statisticByHowReady)
         .build()
-
     val dataForView: Any
     try {
         val data: List<List<String>>
         commander.parse(*argv)
         val csvReader = CsvReader()
+
         data = when{
             taskList.urlFile != "" -> csvReader.readAll(File(taskList.urlFile))
             showTask.urlFile != "" -> csvReader.readAll(File(showTask.urlFile))
@@ -61,7 +61,7 @@ fun main(argv: Array<String>) {
                     title = item[1],
                     registrationDateTime = item[2],
                     startDateTime = item[3],
-                    endDateTime = item[4],
+                    endDateTime = if(item[4] == "") null else item[4],
                     importance = parseImportance(item[5]),
                     urgency = item[6].toBoolean(),
                     percentage = item[7].toInt(),
@@ -74,33 +74,34 @@ fun main(argv: Array<String>) {
             "list" -> workFlowWithTasks.getSortedTaskList()
             "show" -> {
                 workFlowWithTasks.getTaskById(UUID.fromString(showTask.taskID))
-            }
-
-            "list-importance" -> {
-                workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
-            }
-
-            "list-time" -> {
-                val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
-                val format = DateTimeFormatter.ofPattern(dateFormat)
-                if(listTime.time == null){
-                    throw NullPointerException("Дата не может быть нулевой")
-                }
-                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time, format))
-
-            }
-
-            "statistic" -> {
-                val valueStatic: String = statistic.valueStatistic
-                    ?: throw NullPointerException("ValueStatic нее может быть равным null")
-                workFlowWithTasks.getStatisticDate(parseValuesStatistic(valueStatic))
                 return
             }
 
-            "statistic-by-how-ready" -> {
-                workFlowWithTasks.getStatisticByHowReady()
-                return
-            }
+//            "list-importance" -> {
+//                workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
+//            }
+//
+//            "list-time" -> {
+//                val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
+//                val format = DateTimeFormatter.ofPattern(dateFormat)
+//                if(listTime.time == null){
+//                    throw NullPointerException("Дата не может быть нулевой")
+//                }
+//                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time, format))
+//
+//            }
+//
+//            "statistic" -> {
+//                val valueStatic: String = statistic.valueStatistic
+//                    ?: throw NullPointerException("ValueStatic нее может быть равным null")
+//                workFlowWithTasks.getStatisticDate(parseValuesStatistic(valueStatic))
+//                return
+//            }
+//
+//            "statistic-by-how-ready" -> {
+//                workFlowWithTasks.getStatisticByHowReady()
+//                return
+//            }
 
             else -> {
                 println("Не передана ни одна команда!Документация:")
@@ -119,7 +120,6 @@ fun main(argv: Array<String>) {
     val printer = DefaultPrettyPrinter()
     printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
     mapper.enable(SerializationFeature.INDENT_OUTPUT)
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
         .writer(printer)
         .writeValue(System.out, dataForView)
 }

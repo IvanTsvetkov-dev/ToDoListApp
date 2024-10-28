@@ -21,7 +21,7 @@ data class TaskModel(
     val endDateTime: String?,
 
     @JsonProperty("Importance")
-    val importance: Importance,
+    var importance: String,
 
     @JsonProperty("Urgency")
     val urgency: Boolean,
@@ -36,7 +36,7 @@ data class TaskModel(
 
 // view's for list command
 data class TasksForListCommand(
-    @JsonProperty("ID")
+    @JsonProperty("Id")
     val id: UUID,
 
     @JsonProperty("Title")
@@ -50,15 +50,6 @@ data class TasksForListCommand(
 data class TaskCommandList(
     @JsonProperty("tasks")
     val tasks: List<TasksForListCommand>
-)
-
-//view for show command
-data class ParticularTask(
-    @JsonProperty("task-id")
-    val id: UUID,
-
-    @JsonProperty("task")
-    val task: TaskModel
 )
 
 //view's for list-eisenhower
