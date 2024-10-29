@@ -25,7 +25,7 @@ fun main(argv: Array<String>) {
         .newBuilder()
         .addCommand("list", taskList)
         .addCommand("show", showTask)
-        .addCommand("list-importance", listEisenHower)
+        .addCommand("list-eisenhower", listEisenHower)
         .addCommand("list-time", listTime)
         .addCommand("statistic", statistic)
         .addCommand("statistic-by-how-ready", statisticByHowReady)
@@ -36,18 +36,19 @@ fun main(argv: Array<String>) {
         commander.parse(*argv)
         val csvReader = CsvReader()
 
-        data = when{
+        data = when {
             taskList.urlFile != "" -> csvReader.readAll(File(taskList.urlFile))
             showTask.urlFile != "" -> csvReader.readAll(File(showTask.urlFile))
             listEisenHower.urlFile != "" -> csvReader.readAll(File(listEisenHower.urlFile))
             listTime.urlFile != "" -> csvReader.readAll(File(listTime.urlFile))
             statistic.urlFile != "" -> csvReader.readAll(File(statistic.urlFile))
             statisticByHowReady.statisticByHowReadyFile != "" -> {
-                if (argv.contains("--tasks-file")){
+                if (argv.contains("--tasks-file")) {
                     throw IllegalArgumentException("--tasks-file не должен указываться!")
                 }
                 csvReader.readAll(File(statisticByHowReady.statisticByHowReadyFile))
             }
+
             else -> {
                 throw IllegalArgumentException("Пропущен аргумент")
             }
@@ -59,9 +60,9 @@ fun main(argv: Array<String>) {
                 TaskModel(
                     UUID.fromString(item[0]),
                     title = item[1],
-                    registrationDateTime = item[2],
-                    startDateTime = item[3],
-                    endDateTime = if(item[4] == "") null else item[4],
+                    registrationDateTime = LocalDateTime.parse(item[2], DateTimeFormatter.ISO_DATE_TIME),
+                    startDateTime = LocalDateTime.parse(item[3]),
+                    endDateTime = if (item[4] == "") null else LocalDateTime.parse(item[4]),
                     importance = parseImportance(item[5]),
                     urgency = item[6].toBoolean(),
                     percentage = item[7].toInt(),
@@ -77,27 +78,19 @@ fun main(argv: Array<String>) {
                 return
             }
 
-//            "list-importance" -> {
-//                workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
-//            }
-//
-//            "list-time" -> {
-//                val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S"
-//                val format = DateTimeFormatter.ofPattern(dateFormat)
-//                if(listTime.time == null){
-//                    throw NullPointerException("Дата не может быть нулевой")
-//                }
-//                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time, format))
-//
-//            }
-//
-//            "statistic" -> {
-//                val valueStatic: String = statistic.valueStatistic
-//                    ?: throw NullPointerException("ValueStatic нее может быть равным null")
-//                workFlowWithTasks.getStatisticDate(parseValuesStatistic(valueStatic))
-//                return
-//            }
-//
+            "list-eisenhower" -> {
+                workFlowWithTasks.getListEisenHower(listEisenHower.important, listEisenHower.urgent)
+            }
+            "list-time" -> {
+                workFlowWithTasks.getSotrtedListByManyParametresTask(dataTask, LocalDateTime.parse(listTime.time, DateTimeFormatter.ISO_DATE_TIME))
+            }
+            "statistic" -> {
+                val valueStatic: String = statistic.valueStatistic
+                    ?: throw NullPointerException("ValueStatic нее может быть равным null")
+                workFlowWithTasks.getStatisticDate(parseValuesStatistic(valueStatic))
+                return
+            }
+
 //            "statistic-by-how-ready" -> {
 //                workFlowWithTasks.getStatisticByHowReady()
 //                return
@@ -111,7 +104,7 @@ fun main(argv: Array<String>) {
         }
     } catch (e: Exception){
         System.err.println("Ошибка! Приложение использовано некорретно. Читайте документацию! Подробности ошибки: $e")
-        commander.usage()
+//        commander.usage()
         exitProcess(1)
     }
 
@@ -120,6 +113,7 @@ fun main(argv: Array<String>) {
     val printer = DefaultPrettyPrinter()
     printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
     mapper.enable(SerializationFeature.INDENT_OUTPUT)
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
         .writer(printer)
         .writeValue(System.out, dataForView)
 }

@@ -6,20 +6,16 @@ import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.collections.mutableListOf as mutableListOf
+import java.util.UUID
 
 class WorkFlowWithTasks(
     private val tasksData: List<TaskModel>
 ) {
     fun getSortedTaskList() : TaskCommandList
     {
-        val sortedFilteredTasks = tasksData.sortedWith(compareBy {
-            LocalDateTime.parse(it.registrationDateTime)
-
-
-        //            it.id
-            }
+        val sortedFilteredTasks = tasksData.sortedWith(
+            compareBy<TaskModel>{ it.registrationDateTime }.thenBy { it.id }
         )
 
         val totalSortedFilteredTaskList = mutableListOf<TasksForListCommand>()
@@ -66,16 +62,20 @@ class WorkFlowWithTasks(
             writeString(taskById.title)
 
             writeFieldName("RegistrationDateTime")
-            writeString(taskById.registrationDateTime)
+            writeString(taskById.registrationDateTime.toString())
 
             writeFieldName("StartDateTime")
-            writeString(taskById.startDateTime)
+            writeString(taskById.startDateTime.toString())
 
             writeFieldName("EndDateTime")
-            writeString(taskById.endDateTime)
+            if(taskById.endDateTime == null){
+                writeNull()
+            }else{
+                writeString(taskById.endDateTime.toString())
+            }
 
             writeFieldName("Importance")
-            writeString(taskById.importance)
+            writeString(taskById.importance.importance)
 
             writeFieldName("Urgency")
             writeBoolean(taskById.urgency)
@@ -93,127 +93,126 @@ class WorkFlowWithTasks(
             close()
         }
     }
-//    fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
-//        val filteredTasks = tasksData.filter { task ->
-//            (important == null ||
-//                    (important && task.importance in listOf(Importance.HIGH, Importance.VERYHIGH, Importance.CRITICAL)) ||
-//                    (important == false && task.importance in listOf(Importance.VERYLOW, Importance.LOW, Importance.DEFAULT))) &&
-//                    (urgent == null || task.urgency == urgent)
-//        }
-//        val taskForListImportance = mutableListOf<TaskForListImportance>()
-//        filteredTasks.forEach({task ->
-//            taskForListImportance.add(
-//                TaskForListImportance(
-//                    id = task.id,
-//                    title = task.title,
-//                    importance = task.importance.importance,
-//                    urgency = task.urgency,
-//                    percentage = task.percentage
-//                )
-//            )
-//        })
-//        return ListImportance(
-//            important = important,
-//            urgent = urgent,
-//            tasks = taskForListImportance
-//        )
-//    }
-//    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime) : TaskForListTime {
-//        var format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
-//        val listSorted = tasksData.filter { task ->
-//            val taskStartDateTime = LocalDateTime.parse(task.startDateTime, format)
-//            val taskregistrationDateTime = LocalDateTime.parse(task.registrationDateTime, format)
-//            taskStartDateTime.isBefore(inputDateTime) && taskregistrationDateTime.isBefore(inputDateTime) && task.percentage < 100
-//        }.sortedWith(                                              //sortedWith принимает собственный Comparator
-//            compareByDescending<TaskModel> { it.importance.order } //убывание важности
-//                .thenByDescending { it.urgency }
-//                .thenBy { LocalDateTime.parse(it.registrationDateTime, format) }
-//                .thenBy { it.id }
-//        )
+    fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
+        if(important == null && urgent == null){
+            throw IllegalArgumentException()
+        }
+        val importantStatusTask = listOf(Importance.CRITICAL.importance, Importance.VERYHIGH.importance, Importance.HIGH.importance)
+        val unimportantStatusTask = listOf(Importance.LOW.importance, Importance.VERYLOW.importance, Importance.DEFAULT.importance)
+        val filteredTasks = tasksData.filter {
+            task -> (important == null || (important && task.importance.importance in importantStatusTask) || (!important && task.importance.importance in unimportantStatusTask))
+                &&
+                (urgent == null || ((urgent && task.urgency == urgent) || (!urgent && task.urgency == urgent)))
+        }.sortedWith(compareBy<TaskModel> { it.registrationDateTime }
+            .thenBy { it.id })
+
+        val taskForListImportance = mutableListOf<TaskForListImportance>()
+        filteredTasks.forEach({task ->
+            taskForListImportance.add(
+                TaskForListImportance(
+                    id = task.id,
+                    title = task.title,
+                    importance = task.importance.importance,
+                    urgency = task.urgency,
+                    percentage = task.percentage
+                )
+            )
+        })
+        return ListImportance(
+            important = important,
+            urgent = urgent,
+            tasks = taskForListImportance
+        )
+    }
+    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime?) : TaskForListTime {
+        val listSorted = tasksData.filter { task -> (task.startDateTime < inputDateTime) && (task.percentage < 100)
+        }.sortedWith(compareByDescending<TaskModel> {it.importance.ordinal}
+            .thenByDescending{it.urgency}
+            .thenBy { it.registrationDateTime }
+            .thenBy {it.id})
+
+        val taskList = mutableListOf<TaskForListImportance>()
+        listSorted.forEach({task ->
+            taskList.add(
+                TaskForListImportance(
+                    id = task.id,
+                    title = task.title,
+                    importance = task.importance.importance,
+                    urgency = task.urgency,
+                    percentage = task.percentage
+                )
+            )
+        })
+
+        return TaskForListTime(
+            time = inputDateTime.toString(),
+            tasks = taskList
+        )
+
+    }
 //
-//        val taskList = mutableListOf<TaskForListImportance>()
-//        listSorted.forEach({task ->
-//            taskList.add(
-//                TaskForListImportance(
-//                    id = task.id,
-//                    title = task.title,
-//                    importance = task.importance.importance,
-//                    urgency = task.urgency,
-//                    percentage = task.percentage
-//                )
-//            )
-//        })
 //
-//        return TaskForListTime(
-//            time = inputDateTime.toString(),
-//            tasks = taskList
-//        )
-//
-//    }
-//
-//
-//    fun getStatisticDate(typeStatistic: ValuesStatistic) : Unit {
-//        val dayCount: MutableMap<String, Int> = mutableMapOf()
-//        val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
-//
-//        val dayOfWeekTranslations = mapOf(
-//            "MONDAY" to "Понедельник",
-//            "TUESDAY" to "Вторник",
-//            "WEDNESDAY" to "Среда",
-//            "THURSDAY" to "Четверг",
-//            "FRIDAY" to "Пятница",
-//            "SATURDAY" to "Суббота",
-//            "SUNDAY" to "Воскресенье"
-//        )
-//
-//        val weekDaysOrder = listOf(
-//            "Понедельник", "Вторник", "Среда", "Четверг",
-//            "Пятница", "Суббота", "Воскресенье", "Не заполнено"
-//        )
-//
-//        for (task in tasksData) {
-//            val dateString = when (typeStatistic) {
-//                ValuesStatistic.REGISTRATION -> task.registrationDateTime
-//                ValuesStatistic.START -> task.startDateTime
-//                ValuesStatistic.END -> task.endDateTime ?: ""
-//            }
-//
-//            if (dateString.isNotEmpty()) {
-//                val date = LocalDateTime.parse(dateString, format)
-//                val dayOfWeek = dayOfWeekTranslations[date.dayOfWeek.name] ?: date.dayOfWeek.name
-//                dayCount[dayOfWeek] = dayCount.getOrDefault(dayOfWeek, 0) + 1
-//            } else if (typeStatistic == ValuesStatistic.END) {
-//                dayCount["Не заполнено"] = dayCount.getOrDefault("Не заполнено", 0) + 1
-//            }
-//        }
-//
-//        val outputGenerator = createOutputGenerator()
-//
-//        with(outputGenerator) {
-//            writeStartObject()
-//
-//            writeFieldName(when(typeStatistic){
-//                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
-//                ValuesStatistic.START -> "statisticByStartDateTime"
-//                ValuesStatistic.END -> "statisticByEndDateTime"
-//            })
-//
-//            writeStartArray()
-//
-//            for (day in weekDaysOrder) {
-//                dayCount[day]?.let { count ->
-//                    writeStartObject()
-//                    writeFieldName(day)
-//                    writeNumber(count)
-//                    writeEndObject()
-//                }
-//            }
-//            writeEndArray()
-//
-//            writeEndObject()
-//            close()
-//        }
-//    }
+    fun getStatisticDate(typeStatistic: ValuesStatistic) : Unit {
+        val dayCount: MutableMap<String, Int> = mutableMapOf()
+
+        val dayOfWeekTranslations = mapOf(
+            "MONDAY" to "Понедельник",
+            "TUESDAY" to "Вторник",
+            "WEDNESDAY" to "Среда",
+            "THURSDAY" to "Четверг",
+            "FRIDAY" to "Пятница",
+            "SATURDAY" to "Суббота",
+            "SUNDAY" to "Воскресенье"
+        )
+
+        val weekDaysOrder = listOf(
+            "Понедельник", "Вторник", "Среда", "Четверг",
+            "Пятница", "Суббота", "Воскресенье", "Не заполнено"
+        )
+
+        for (task in tasksData) {
+            val dateString = when (typeStatistic) {
+                ValuesStatistic.REGISTRATION -> task.registrationDateTime
+                ValuesStatistic.START -> task.startDateTime
+                ValuesStatistic.END -> task.endDateTime ?: ""
+            }
+
+            if (dateString.toString().isNotEmpty()) {
+                val date = LocalDateTime.parse(dateString.toString(), DateTimeFormatter.ISO_DATE_TIME)
+                val dayOfWeek = dayOfWeekTranslations[date.dayOfWeek.name] ?: date.dayOfWeek.name
+                dayCount[dayOfWeek] = dayCount.getOrDefault(dayOfWeek, 0) + 1
+            } else if (typeStatistic == ValuesStatistic.END) {
+                dayCount["Не заполнено"] = dayCount.getOrDefault("Не заполнено", 0) + 1
+            }
+        }
+
+        val outputGenerator = createOutputGenerator()
+
+        with(outputGenerator) {
+            writeStartObject()
+
+            writeFieldName(when(typeStatistic){
+                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
+                ValuesStatistic.START -> "statisticByStartDateTime"
+                ValuesStatistic.END -> "statisticByEndDateTime"
+            })
+
+            writeStartArray()
+
+            for (day in weekDaysOrder) {
+                dayCount[day]?.let { count ->
+                    writeStartObject()
+                    writeFieldName(day)
+                    writeNumber(count)
+                    writeEndObject()
+                }
+            }
+            writeEndArray()
+
+            writeEndObject()
+            close()
+        }
+    }
 //    fun getStatisticByHowReady() : Unit{
 //        val statisticCount: MutableMap<String, Int> = mutableMapOf()
 //        val statisticStatus = listOf(

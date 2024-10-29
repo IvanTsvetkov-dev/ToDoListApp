@@ -9,11 +9,15 @@ enum class Importance(var importance: String) {
     CRITICAL("критический")
 
 }
-fun parseImportance(importanceString: String): String {
-    for(importance in Importance.entries){
-        if(importanceString == importance.importance){
-            return importanceString
-        }
+fun parseImportance(importanceString: String): Importance {
+    return when(importanceString){
+        "очень низкий" -> Importance.VERYLOW
+        "низкий" -> Importance.LOW
+        "обычный" -> Importance.DEFAULT
+        "высокий" -> Importance.HIGH
+        "очень высокий" -> Importance.VERYHIGH
+        "критический" -> Importance.CRITICAL
+        else -> throw IllegalArgumentException("Неизвестный Importance. Может быть только очень низкий, низкий, обычный, высокий, очень высокий, критический")
+
     }
-    throw IllegalArgumentException("Неизвестный Importance. Может быть только очень низкий, низкий, обычный, высокий, очень высокий, критический")
 }

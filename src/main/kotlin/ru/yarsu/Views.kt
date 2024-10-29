@@ -1,7 +1,9 @@
 package ru.yarsu
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 //Basic view
 data class TaskModel(
@@ -12,16 +14,16 @@ data class TaskModel(
     val title: String,
 
     @JsonProperty("RegistrationDateTime")
-    val registrationDateTime: String,
+    val registrationDateTime: LocalDateTime,
 
     @JsonProperty("StartDateTime")
-    val startDateTime: String,
+    val startDateTime: LocalDateTime,
 
     @JsonProperty("EndDateTime")
-    val endDateTime: String?,
+    val endDateTime: LocalDateTime?,
 
     @JsonProperty("Importance")
-    var importance: String,
+    var importance: Importance,
 
     @JsonProperty("Urgency")
     val urgency: Boolean,
@@ -32,6 +34,17 @@ data class TaskModel(
     @JsonProperty("Description")
     val description: String
 )
+//    : Comparable<TaskModel> {
+//    override fun compareTo(other: TaskModel): Int {
+//        if(LocalDateTime.parse(registrationDateTime) == LocalDateTime.parse(other.registrationDateTime)){
+//            return 0;
+//        }
+//        if(LocalDateTime.parse(registrationDateTime) < LocalDateTime.parse(other.registrationDateTime)){
+//            return -1;
+//        }
+//        return 1;
+//    }
+//}
 //Other views
 
 // view's for list command
