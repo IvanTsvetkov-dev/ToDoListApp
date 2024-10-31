@@ -2,12 +2,20 @@ package ru.yarsu
 import com.beust.jcommander.*;
 import java.time.LocalDateTime
 
-@Parameters(separators = "=")
+@Parameters()
 open class Args {
     @Parameter(names = ["--tasks-file"],
         required = true,
         description = "Обязательный аргумент, принимает путь к csv файлу с данными")
     var urlFile: String = ""
+    @Parameter(names = ["--users-file"],
+        required = true,
+        description = "Имя файла с пользователями приложения")
+    var userFile: String? = ""
+    @Parameter(names = ["--port"],
+        required = true,
+        description = "Порт, по которому доступен веб-сервер")
+    var numberPort: Int? = 0
 }
 
 @Parameters(separators = "=", commandDescription = "Выводит информацию о задаче по её UUID")

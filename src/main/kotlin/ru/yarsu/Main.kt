@@ -21,6 +21,8 @@ fun main(argv: Array<String>) {
     val statistic = Statistic()
     val statisticByHowReady = StatisticByHowReady()
 
+
+
     val commander: JCommander = JCommander
         .newBuilder()
         .addCommand("list", taskList)
