@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import java.io.StringWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.collections.mutableListOf as mutableListOf
@@ -38,13 +39,19 @@ class WorkFlowWithTasks(
 
         return viewTotalSortedFilteredTaskList
     }
-    fun getTaskById(id: UUID) : Unit
+    fun getTaskById(id: UUID) : String?
     {
-        var taskById = tasksData.find { it.id == id }
+        val taskById = tasksData.find { it.id == id }
         if (taskById == null){
-            throw NullPointerException("Задание с таким id не найдено!")
+            return null
         }
-        val outputGenerator = createOutputGenerator()
+
+        val stringWriter = StringWriter()
+        val factory: JsonFactory = JsonFactory() //фабрика объектов для считывания или записи объектов
+        val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
+        val printer = DefaultPrettyPrinter()
+        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+        outputGenerator.prettyPrinter = printer
 
         with(outputGenerator){
             writeStartObject()
@@ -92,6 +99,7 @@ class WorkFlowWithTasks(
             writeEndObject()
             close()
         }
+        return stringWriter.toString()
     }
     fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
         if(important == null && urgent == null){
@@ -186,32 +194,32 @@ class WorkFlowWithTasks(
             }
         }
 
-        val outputGenerator = createOutputGenerator()
-
-        with(outputGenerator) {
-            writeStartObject()
-
-            writeFieldName(when(typeStatistic){
-                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
-                ValuesStatistic.START -> "statisticByStartDateTime"
-                ValuesStatistic.END -> "statisticByEndDateTime"
-            })
-
-            writeStartArray()
-
-            for (day in weekDaysOrder) {
-                dayCount[day]?.let { count ->
-                    writeStartObject()
-                    writeFieldName(day)
-                    writeNumber(count)
-                    writeEndObject()
-                }
-            }
-            writeEndArray()
-
-            writeEndObject()
-            close()
-        }
+//        val outputGenerator = createOutputGenerator()
+//
+//        with(outputGenerator) {
+//            writeStartObject()
+//
+//            writeFieldName(when(typeStatistic){
+//                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
+//                ValuesStatistic.START -> "statisticByStartDateTime"
+//                ValuesStatistic.END -> "statisticByEndDateTime"
+//            })
+//
+//            writeStartArray()
+//
+//            for (day in weekDaysOrder) {
+//                dayCount[day]?.let { count ->
+//                    writeStartObject()
+//                    writeFieldName(day)
+//                    writeNumber(count)
+//                    writeEndObject()
+//                }
+//            }
+//            writeEndArray()
+//
+//            writeEndObject()
+//            close()
+//        }
     }
 //    fun getStatisticByHowReady() : Unit{
 //        val statisticCount: MutableMap<String, Int> = mutableMapOf()
@@ -284,13 +292,5 @@ class WorkFlowWithTasks(
 //            close()
 //        }
 //    }
-    private fun createOutputGenerator() : JsonGenerator{
-        val factory: JsonFactory = JsonFactory()
-        val outputGenerator: JsonGenerator = factory.createGenerator(System.out)
-        val printer = DefaultPrettyPrinter()
-        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-        outputGenerator.prettyPrinter = printer
-        return outputGenerator
-    }
 
 }
