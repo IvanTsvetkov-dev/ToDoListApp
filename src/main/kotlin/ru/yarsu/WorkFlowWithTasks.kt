@@ -16,7 +16,7 @@ import java.util.UUID
 class WorkFlowWithTasks(
     private val tasksData: List<TaskModel>
 ) {
-    fun getSortedTaskList(page: Int, recordsPerPage: Int) : List<TasksForListCommand>
+    fun getSortedTaskList() : List<TasksForListCommand>
     {
         val sortedFilteredTasks = tasksData.sortedWith(
             compareBy<TaskModel>{ it.registrationDateTime }.thenBy { it.id }
@@ -35,16 +35,7 @@ class WorkFlowWithTasks(
                 )
             )
         })
-        if(page < 1){
-            throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")
-        }
-        if(recordsPerPage !in listOf(5, 10, 20, 50)){
-            throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")
-        }
-        if(page * recordsPerPage > sortedFilteredTasks.count()){
-            return listOf()
-        }
-        return totalSortedFilteredTaskList.drop(page-1).take(recordsPerPage)
+        return totalSortedFilteredTaskList
     }
     fun getTaskById(id: UUID) : TaskModel
     {
@@ -54,7 +45,7 @@ class WorkFlowWithTasks(
         }
         return taskById
     }
-    fun getListEisenHower(important: Boolean?, urgent: Boolean?, page: Int, recordsPerPage: Int) : List<TaskForListImportance>{
+    fun getListEisenHower(important: Boolean?, urgent: Boolean?) : List<TaskForListImportance>{
         if(important == null && urgent == null){
             throw IllegalArgumentException("Некорретные параметры важности и срочности.Хотя бы один из них должен быть указан")
         }
@@ -79,15 +70,6 @@ class WorkFlowWithTasks(
                 )
             )
         })
-        if(page < 1){
-            throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")
-        }
-        if(recordsPerPage !in listOf(5, 10, 20, 50)){
-            throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")
-        }
-        if(page * recordsPerPage > taskForListImportance.count()){
-            return listOf()
-        }
         return taskForListImportance
     }
     fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime?) : TaskForListTime {

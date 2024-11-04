@@ -4,6 +4,7 @@ import org.http4k.core.*
 import ru.yarsu.TaskModel
 import ru.yarsu.User
 import ru.yarsu.WorkFlowWithTasks
+import ru.yarsu.pagination
 import ru.yarsu.serializers.EisenHowerListSerializer
 
 class EisenhowerListHandler(private val tasklist: List<TaskModel>) : HttpHandler {
@@ -22,7 +23,7 @@ class EisenhowerListHandler(private val tasklist: List<TaskModel>) : HttpHandler
         try{
             if(important.toString() !in listOf("null", "true", "false")){throw IllegalArgumentException("Неверно переданный аргумент важности. Ожидалось true, false, null(в случае отсутствия), а не $important")}
             if(urgent.toString() !in listOf("null", "true", "false")){throw IllegalArgumentException("Неверно переданный аргумент срочности. Ожидалось true, false, null(в случае отсутствия), а не $urgent")}
-            val listEisenHower = workFlowWithTasks.getListEisenHower(if (important == null) null else important.toBoolean(), if (urgent == null) null else urgent.toBoolean(), page.toInt(), recordsPerPage.toInt())
+            val listEisenHower = pagination(workFlowWithTasks.getListEisenHower(if (important == null) null else important.toBoolean(), if (urgent == null) null else urgent.toBoolean()), page.toInt(), recordsPerPage.toInt())
             return Response(Status.OK).body(eisenHowerListSerializer.eisenHowerList(listEisenHower))
         }catch (e: IllegalArgumentException){
             return Response(Status.BAD_REQUEST).body(eisenHowerListSerializer.serializeError(e.message.toString()))

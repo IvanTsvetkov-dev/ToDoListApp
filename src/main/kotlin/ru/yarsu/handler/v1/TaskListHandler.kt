@@ -2,7 +2,9 @@ package ru.yarsu.handler.v1
 
 import org.http4k.core.*
 import ru.yarsu.TaskModel
+import ru.yarsu.TasksForListCommand
 import ru.yarsu.WorkFlowWithTasks
+import ru.yarsu.pagination
 import ru.yarsu.serializers.TaskListSerializer
 
 class TaskListHandler(private val taskList: List<TaskModel>) : HttpHandler{
@@ -15,7 +17,7 @@ class TaskListHandler(private val taskList: List<TaskModel>) : HttpHandler{
 
         val taskListSerializer = TaskListSerializer()
         try{
-            val result = workFlowWithTasks.getSortedTaskList(page.toInt(), recordsPerPage.toInt())
+            val result: List<TasksForListCommand> = pagination(workFlowWithTasks.getSortedTaskList(), page.toInt(), recordsPerPage.toInt())
             return Response(Status.OK).body(taskListSerializer.taskList(result))
         } catch (e: IllegalArgumentException){
             return Response(Status.BAD_REQUEST).body(taskListSerializer.serializeError(e.message.toString()))
