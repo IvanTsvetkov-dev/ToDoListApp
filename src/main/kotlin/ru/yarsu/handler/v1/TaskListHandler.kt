@@ -17,6 +17,9 @@ class TaskListHandler(private val taskList: List<TaskModel>) : HttpHandler{
 
         val taskListSerializer = TaskListSerializer()
         try{
+            if(recordsPerPage !in listOf("5", "10", "20", "50")){
+                throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")
+            }
             val result: List<TasksForListCommand> = pagination(workFlowWithTasks.getSortedTaskList(), page.toInt(), recordsPerPage.toInt())
             return Response(Status.OK).body(taskListSerializer.taskList(result))
         } catch (e: IllegalArgumentException){

@@ -28,7 +28,7 @@ fun main(argv: Array<String>) {
 
         val pathToUsersFile = args.userFile ?: throw ParameterException("Error: missing option --users-file")
 
-        //Get Router
+        //TODO handle uncorrect arg : --tasks-file --users-file --port
         val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
 
         val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()

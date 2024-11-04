@@ -47,7 +47,7 @@ class WorkFlowWithTasks(
     }
     fun getListEisenHower(important: Boolean?, urgent: Boolean?) : List<TaskForListImportance>{
         if(important == null && urgent == null){
-            throw IllegalArgumentException("Некорретные параметры важности и срочности.Хотя бы один из них должен быть указан")
+            throw IllegalArgumentException("Отсутствуют оба параметра important и urgent")
         }
         val importantStatusTask = listOf(Importance.CRITICAL.importance, Importance.VERYHIGH.importance, Importance.HIGH.importance)
         val unimportantStatusTask = listOf(Importance.LOW.importance, Importance.VERYLOW.importance, Importance.DEFAULT.importance)
