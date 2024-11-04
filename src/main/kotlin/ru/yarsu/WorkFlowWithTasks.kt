@@ -72,7 +72,7 @@ class WorkFlowWithTasks(
         })
         return taskForListImportance
     }
-    fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime?) : TaskForListTime {
+    fun getListTime(tasksData: List<TaskModel>, inputDateTime: LocalDateTime?) : List<TaskForListImportance> {
         val listSorted = tasksData.filter { task -> (task.startDateTime < inputDateTime) && (task.percentage < 100)
         }.sortedWith(compareByDescending<TaskModel> {it.importance.ordinal}
             .thenByDescending{it.urgency}
@@ -91,11 +91,7 @@ class WorkFlowWithTasks(
                 )
             )
         })
-
-        return TaskForListTime(
-            time = inputDateTime.toString(),
-            tasks = taskList
-        )
+        return taskList
 
     }
 //
