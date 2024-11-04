@@ -9,6 +9,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import ru.yarsu.TaskModel
 import ru.yarsu.User
+import ru.yarsu.handler.v1.EisenhowerListHandler
 import ru.yarsu.handler.v1.PingHandler
 import ru.yarsu.handler.v1.TaskListHandler
 import ru.yarsu.handler.v1.TaskShowHandler
@@ -21,6 +22,7 @@ fun applicationRoutes(taskList: List<TaskModel>, userList: List<User>) : Routing
         "/v1" bind routes(
             "/list-tasks" bind Method.GET to TaskListHandler(taskList),
             "/task/{task-id}" bind Method.GET to TaskShowHandler(taskList, userList),
+            "list-eisenhower" bind Method.GET to EisenhowerListHandler(taskList)
         )
     )
     return app

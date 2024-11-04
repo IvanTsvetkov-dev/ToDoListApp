@@ -54,9 +54,9 @@ class WorkFlowWithTasks(
         }
         return taskById
     }
-    fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
+    fun getListEisenHower(important: Boolean?, urgent: Boolean?, page: Int, recordsPerPage: Int) : List<TaskForListImportance>{
         if(important == null && urgent == null){
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Некорретные параметры важности и срочности.Хотя бы один из них должен быть указан")
         }
         val importantStatusTask = listOf(Importance.CRITICAL.importance, Importance.VERYHIGH.importance, Importance.HIGH.importance)
         val unimportantStatusTask = listOf(Importance.LOW.importance, Importance.VERYLOW.importance, Importance.DEFAULT.importance)
@@ -79,11 +79,16 @@ class WorkFlowWithTasks(
                 )
             )
         })
-        return ListImportance(
-            important = important,
-            urgent = urgent,
-            tasks = taskForListImportance
-        )
+        if(page < 1){
+            throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")
+        }
+        if(recordsPerPage !in listOf(5, 10, 20, 50)){
+            throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")
+        }
+        if(page * recordsPerPage > taskForListImportance.count()){
+            return listOf()
+        }
+        return taskForListImportance
     }
     fun getSotrtedListByManyParametresTask(tasksData: List<TaskModel>, inputDateTime: LocalDateTime?) : TaskForListTime {
         val listSorted = tasksData.filter { task -> (task.startDateTime < inputDateTime) && (task.percentage < 100)

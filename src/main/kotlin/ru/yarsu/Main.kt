@@ -32,6 +32,7 @@ fun main(argv: Array<String>) {
         val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
 
         val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
+
     } catch (e: Exception){
         System.err.println("Ошибка! Приложение использовано некорретно. Читайте документацию! Подробности ошибки: $e")
         exitProcess(1)

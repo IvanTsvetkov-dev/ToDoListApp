@@ -76,18 +76,6 @@ data class TaskCommandList(
     val tasks: List<TasksForListCommand>
 )
 
-//view's for list-eisenhower
-data class ListImportance(
-    @JsonProperty("important")
-    val important: Boolean?,
-
-    @JsonProperty("urgent")
-    val urgent: Boolean?,
-
-    @JsonProperty("tasks")
-    val tasks: List<TaskForListImportance>
-)
-
 data class TaskForListImportance(
     @JsonProperty("Id")
     val id: UUID,

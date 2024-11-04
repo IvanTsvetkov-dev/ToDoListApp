@@ -20,7 +20,6 @@ import java.util.*
 class TaskShowHandler(private val tasklist: List<TaskModel>,
     private val userList: List<User>) : HttpHandler{
     override fun invoke(request: Request) : Response {
-        //обработка query параметров
         val taskId : String = request.path("task-id") ?: return Response(Status.NOT_FOUND)
 
         //создание класса предметной области
