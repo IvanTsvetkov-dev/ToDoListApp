@@ -1,4 +1,4 @@
-package ru.yarsu.web.routes
+package ru.yarsu.handler.v1
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.util.DefaultIndenter

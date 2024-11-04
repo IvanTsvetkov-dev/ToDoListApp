@@ -1,9 +1,12 @@
 package ru.yarsu
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.StringWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -13,7 +16,7 @@ import java.util.UUID
 class WorkFlowWithTasks(
     private val tasksData: List<TaskModel>
 ) {
-    fun getSortedTaskList() : TaskCommandList
+    fun getSortedTaskList(page: Int, recordsPerPage: Int) : List<TasksForListCommand>
     {
         val sortedFilteredTasks = tasksData.sortedWith(
             compareBy<TaskModel>{ it.registrationDateTime }.thenBy { it.id }
@@ -32,12 +35,16 @@ class WorkFlowWithTasks(
                 )
             )
         })
-
-        val viewTotalSortedFilteredTaskList: TaskCommandList = TaskCommandList(
-            totalSortedFilteredTaskList
-        )
-
-        return viewTotalSortedFilteredTaskList
+        if(page < 1){
+            throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")
+        }
+        if(recordsPerPage !in listOf(5, 10, 20, 50)){
+            throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")
+        }
+        if(page * recordsPerPage > sortedFilteredTasks.count()){
+            return listOf()
+        }
+        return totalSortedFilteredTaskList.drop(page-1).take(recordsPerPage)
     }
     fun getTaskById(id: UUID) : String?
     {
@@ -47,7 +54,7 @@ class WorkFlowWithTasks(
         }
 
         val stringWriter = StringWriter()
-        val factory: JsonFactory = JsonFactory() //фабрика объектов для считывания или записи объектов
+        val factory = JsonFactory() //фабрика объектов для считывания или записи объектов
         val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
         val printer = DefaultPrettyPrinter()
         printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
