@@ -20,7 +20,8 @@ fun applicationRoutes(taskList: List<TaskModel>, userList: List<User>) : Routing
             "/list-tasks" bind Method.GET to TaskListHandler(taskList),
             "/task/{task-id}" bind Method.GET to TaskShowHandler(taskList, userList),
             "/list-eisenhower" bind Method.GET to EisenhowerListHandler(taskList),
-            "/list-time" bind Method.GET to ListTimeHandler(taskList)
+            "/list-time" bind Method.GET to ListTimeHandler(taskList),
+            "/statistic" bind Method.GET to StatisticHandler(taskList)
         )
     )
     return app

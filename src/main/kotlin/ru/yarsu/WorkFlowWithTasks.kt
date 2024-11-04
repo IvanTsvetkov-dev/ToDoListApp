@@ -96,7 +96,7 @@ class WorkFlowWithTasks(
     }
 //
 //
-    fun getStatisticDate(typeStatistic: ValuesStatistic) : Unit {
+    fun getStatisticDate(typeStatistic: ValuesStatistic) : Map<String, Int> {
         val dayCount: MutableMap<String, Int> = mutableMapOf()
 
         val dayOfWeekTranslations = mapOf(
@@ -130,32 +130,8 @@ class WorkFlowWithTasks(
             }
         }
 
-//        val outputGenerator = createOutputGenerator()
-//
-//        with(outputGenerator) {
-//            writeStartObject()
-//
-//            writeFieldName(when(typeStatistic){
-//                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
-//                ValuesStatistic.START -> "statisticByStartDateTime"
-//                ValuesStatistic.END -> "statisticByEndDateTime"
-//            })
-//
-//            writeStartArray()
-//
-//            for (day in weekDaysOrder) {
-//                dayCount[day]?.let { count ->
-//                    writeStartObject()
-//                    writeFieldName(day)
-//                    writeNumber(count)
-//                    writeEndObject()
-//                }
-//            }
-//            writeEndArray()
-//
-//            writeEndObject()
-//            close()
-//        }
+        return dayCount
+
     }
 //    fun getStatisticByHowReady() : Unit{
 //        val statisticCount: MutableMap<String, Int> = mutableMapOf()
