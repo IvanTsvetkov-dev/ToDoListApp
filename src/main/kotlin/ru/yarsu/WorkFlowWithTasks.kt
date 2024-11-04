@@ -46,67 +46,13 @@ class WorkFlowWithTasks(
         }
         return totalSortedFilteredTaskList.drop(page-1).take(recordsPerPage)
     }
-    fun getTaskById(id: UUID) : String?
+    fun getTaskById(id: UUID) : TaskModel
     {
         val taskById = tasksData.find { it.id == id }
         if (taskById == null){
-            return null
+            throw NullPointerException("Задача не найдена")
         }
-
-        val stringWriter = StringWriter()
-        val factory = JsonFactory() //фабрика объектов для считывания или записи объектов
-        val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
-        val printer = DefaultPrettyPrinter()
-        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-        outputGenerator.prettyPrinter = printer
-
-        with(outputGenerator){
-            writeStartObject()
-
-            writeFieldName("task-id")
-            writeString(taskById.id.toString())
-
-            writeFieldName("task")
-            writeStartObject()
-
-            writeFieldName("Id")
-            writeString(taskById.id.toString())
-
-            writeFieldName("Title")
-            writeString(taskById.title)
-
-            writeFieldName("RegistrationDateTime")
-            writeString(taskById.registrationDateTime.toString())
-
-            writeFieldName("StartDateTime")
-            writeString(taskById.startDateTime.toString())
-
-            writeFieldName("EndDateTime")
-            if(taskById.endDateTime == null){
-                writeNull()
-            }else{
-                writeString(taskById.endDateTime.toString())
-            }
-
-            writeFieldName("Importance")
-            writeString(taskById.importance.importance)
-
-            writeFieldName("Urgency")
-            writeBoolean(taskById.urgency)
-
-            writeFieldName("Percentage")
-            writeNumber(taskById.percentage)
-
-            writeFieldName("Description")
-            writeString(taskById.description)
-
-            writeFieldName("IsClosed")
-            writeBoolean(if (taskById.percentage == 100) true else false)
-
-            writeEndObject()
-            close()
-        }
-        return stringWriter.toString()
+        return taskById
     }
     fun getListEisenHower(important: Boolean?, urgent: Boolean?) : ListImportance {
         if(important == null && urgent == null){

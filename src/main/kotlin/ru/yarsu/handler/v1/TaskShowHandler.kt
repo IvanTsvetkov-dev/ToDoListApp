@@ -9,47 +9,34 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.routing.path
 import ru.yarsu.TaskModel
+import ru.yarsu.User
 import ru.yarsu.WorkFlowWithTasks
+import ru.yarsu.WorkFlowWithUsers
+import ru.yarsu.serializers.TaskShowSerializer
 import java.io.StringWriter
 import java.util.*
 
 
-class TaskShowHandler(private val tasklist: List<TaskModel>) : HttpHandler{
+class TaskShowHandler(private val tasklist: List<TaskModel>,
+    private val userList: List<User>) : HttpHandler{
     override fun invoke(request: Request) : Response {
         //обработка query параметров
         val taskId : String = request.path("task-id") ?: return Response(Status.NOT_FOUND)
 
-        //создание класса
+        //создание класса предметной области
         val workFlowWithTasks = WorkFlowWithTasks(tasklist)
+        val workFlowWithUsers = WorkFlowWithUsers(userList)
 
-        //TODO handle potential with error uuid.fromString(taskId)
-
-        val task = workFlowWithTasks.getTaskById(UUID.fromString(taskId))
-
-        if(task == null){
-            val errorMessage = StringWriter()
-
-            val factory = JsonFactory()
-            val outputGenerator = factory.createGenerator(errorMessage)
-
-            val printer = DefaultPrettyPrinter()
-            printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-            outputGenerator.prettyPrinter = printer
-
-            with(outputGenerator){
-                writeStartObject()
-
-                writeFieldName("task-id")
-                writeString(taskId)
-
-                writeFieldName("error")
-                writeString("Задача не найдена ")
-
-                writeEndObject()
-                close()
-            }
-            return Response(Status.NOT_FOUND).body(errorMessage.toString())
-        }else
-            return Response(Status.OK).body(task)
+        val taskShowSerializer = TaskShowSerializer()
+        try {
+            val uuid = UUID.fromString(taskId)
+            val task = workFlowWithTasks.getTaskById(uuid)
+            val user = workFlowWithUsers.getUserByUUIDAuthor(task.author)
+            return Response(Status.OK).body(taskShowSerializer.serializeeTask(task, user?.email))
+        }catch (e: NullPointerException){
+            return Response(Status.NOT_FOUND).body(taskShowSerializer.serializeNotFoundTask(taskId, e.message.toString()))
+        }catch (e: IllegalArgumentException){
+            return Response(Status.BAD_REQUEST).body(taskShowSerializer.serializeError("Некорректный идентификатор задачи. Для параметра task-id ожидается UUID, но получено значение $taskId"))
+        }
     }
 }

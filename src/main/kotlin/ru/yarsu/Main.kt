@@ -28,10 +28,8 @@ fun main(argv: Array<String>) {
 
         val pathToUsersFile = args.userFile ?: throw ParameterException("Error: missing option --users-file")
 
-        val taskList: List<TaskModel> = readTaskFileCsv(pathToTasksFile)
-
         //Get Router
-        val app = applicationRoutes(taskList)
+        val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
 
         val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
     } catch (e: Exception){
@@ -55,13 +53,32 @@ fun readTaskFileCsv(pathToTasksFile : String) : List<TaskModel>{
                 importance = parseImportance(item[5]),
                 urgency = item[6].toBoolean(),
                 percentage = item[7].toInt(),
-                description = item[8]
+                description = item[8],
+                UUID.fromString(item[9])
             )
         )
     }
     return dataTask
 }
+fun readUserFileCsv(pathToTasksFile: String) : List<User>{
+    val csvReader = CsvReader()
+    val data = csvReader.readAll(File(pathToTasksFile))
 
+    val dataOfUsers = mutableListOf<User>()
+
+    for(item in data.drop(1)){
+        dataOfUsers.add(
+            User(
+                UUID.fromString(item[0]),
+                item[1],
+                LocalDateTime.parse(item[2], DateTimeFormatter.ISO_DATE_TIME).toString(),
+                item[3]
+
+            )
+        )
+    }
+    return dataOfUsers
+}
 //    val mapper = jacksonObjectMapper()
 //    val printer = DefaultPrettyPrinter()
 //    printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)

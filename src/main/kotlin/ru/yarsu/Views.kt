@@ -4,8 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
+data class User(
+    val id: UUID,
 
-//Basic view
+    val login: String,
+
+    val registrationDateTime: String,
+
+    val email: String
+)
+
 data class TaskModel(
     @JsonProperty("ID")
     val id: UUID,
@@ -32,7 +40,10 @@ data class TaskModel(
     val percentage: Int,
 
     @JsonProperty("Description")
-    val description: String
+    val description: String,
+
+    @JsonProperty("Author")
+    val author: UUID,
 )
 //    : Comparable<TaskModel> {
 //    override fun compareTo(other: TaskModel): Int {
