@@ -1,11 +1,11 @@
-package ru.yarsu.handler.v1
+package ru.yarsu.v1.handler
 
 import org.http4k.core.*
 import ru.yarsu.TaskModel
 import ru.yarsu.User
 import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.pagination
-import ru.yarsu.serializers.EisenHowerListSerializer
+import ru.yarsu.v1.serializers.EisenHowerListSerializer
 
 class EisenhowerListHandler(private val tasklist: List<TaskModel>) : HttpHandler {
     override fun invoke(request: Request): Response {

@@ -1,15 +1,16 @@
-package ru.yarsu.serializers
+package ru.yarsu.v1.serializers
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.ser.Serializers.Base
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import ru.yarsu.TasksForListCommand
+import ru.yarsu.TaskForListImportance
 import java.io.StringWriter
 
-class TaskListSerializer: BaseSerializer(){
-    fun taskList(taskList: List<TasksForListCommand>) : String{
+class EisenHowerListSerializer : BaseSerializer() {
+    fun eisenHowerList(list: List<TaskForListImportance>) : String{
         val stringWriter = StringWriter()
         val mapper = jacksonObjectMapper()
         val printer = DefaultPrettyPrinter()
@@ -17,8 +18,7 @@ class TaskListSerializer: BaseSerializer(){
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .writer(printer)
-            .writeValue(stringWriter, taskList)
-
+            .writeValue(stringWriter, list)
         return stringWriter.toString()
     }
 }

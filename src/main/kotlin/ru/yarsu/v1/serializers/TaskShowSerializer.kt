@@ -1,4 +1,4 @@
-package ru.yarsu.serializers
+package ru.yarsu.v1.serializers
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator

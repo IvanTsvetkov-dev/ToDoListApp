@@ -1,6 +1,6 @@
 package ru.yarsu
 
-fun<T> pagination(listToPaginate: List<T> ,page: Int, recordsPerPage: Int) : List<T>{
+fun<T> pagination(listToPaginate: List<T>, page: Int, recordsPerPage: Int) : List<T>{
     if(page < 1){
         throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")
     }
@@ -10,5 +10,5 @@ fun<T> pagination(listToPaginate: List<T> ,page: Int, recordsPerPage: Int) : Lis
     if(page * recordsPerPage > listToPaginate.count()){
         return listOf()
     }
-    return listToPaginate.drop(page-1).take(recordsPerPage)
+    return listToPaginate.drop(recordsPerPage * (page - 1) ).take(recordsPerPage)
 }

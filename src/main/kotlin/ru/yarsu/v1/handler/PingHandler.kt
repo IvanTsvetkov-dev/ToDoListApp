@@ -1,4 +1,4 @@
-package ru.yarsu.handler.v1
+package ru.yarsu.v1.handler
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request

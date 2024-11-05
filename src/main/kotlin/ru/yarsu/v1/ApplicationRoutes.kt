@@ -1,4 +1,4 @@
-package ru.yarsu.web.routes
+package ru.yarsu.v1
 
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -9,7 +9,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import ru.yarsu.TaskModel
 import ru.yarsu.User
-import ru.yarsu.handler.v1.*
+import ru.yarsu.v1.handler.*
 
 fun applicationRoutes(taskList: List<TaskModel>, userList: List<User>) : RoutingHttpHandler{
     //routes является http обработчиком типа RoutingHttpHandler.

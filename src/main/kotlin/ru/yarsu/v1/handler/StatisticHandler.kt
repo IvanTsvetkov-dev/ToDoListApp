@@ -1,12 +1,12 @@
-package ru.yarsu.handler.v1
+package ru.yarsu.v1.handler
 
 import org.http4k.core.*
 import ru.yarsu.TaskModel
 import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.pagination
 import ru.yarsu.parseValuesStatistic
-import ru.yarsu.serializers.ListTimeSerializer
-import ru.yarsu.serializers.StatisticSerializer
+import ru.yarsu.v1.serializers.ListTimeSerializer
+import ru.yarsu.v1.serializers.StatisticSerializer
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException

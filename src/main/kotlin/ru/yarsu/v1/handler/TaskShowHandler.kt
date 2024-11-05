@@ -1,4 +1,4 @@
-package ru.yarsu.handler.v1
+package ru.yarsu.v1.handler
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.util.DefaultIndenter
@@ -12,7 +12,7 @@ import ru.yarsu.TaskModel
 import ru.yarsu.User
 import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.WorkFlowWithUsers
-import ru.yarsu.serializers.TaskShowSerializer
+import ru.yarsu.v1.serializers.TaskShowSerializer
 import java.io.StringWriter
 import java.util.*
 

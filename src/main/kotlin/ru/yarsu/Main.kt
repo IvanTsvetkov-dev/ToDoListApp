@@ -3,7 +3,6 @@ package ru.yarsu
 import com.beust.jcommander.*
 import java.util.*
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
-import org.http4k.core.*
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.*
@@ -11,7 +10,7 @@ import kotlin.system.exitProcess
 
 import org.http4k.server.Netty
 import org.http4k.server.asServer
-import ru.yarsu.web.routes.applicationRoutes
+import ru.yarsu.v1.applicationRoutes
 
 
 fun main(argv: Array<String>) {
@@ -22,19 +21,21 @@ fun main(argv: Array<String>) {
         .build()
     try {
         val data: List<List<String>>
+
         commander.parse(*argv)
 
         val pathToTasksFile = args.urlFile ?: throw ParameterException("Error: missing option --tasks-file")
 
         val pathToUsersFile = args.userFile ?: throw ParameterException("Error: missing option --users-file")
 
-        //TODO handle uncorrect arg : --tasks-file --users-file --portп
+        //TODO handle uncorrect arg : --tasks-file --users-file --port
+
         val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
 
         val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
 
     } catch (e: Exception){
-        System.err.println("Ошибка! Приложение использовано некорретно. Читайте документацию! Подробности ошибки: $e")
+        System.err.println("$e")
         exitProcess(1)
     }
 }
