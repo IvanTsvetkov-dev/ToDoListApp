@@ -20,9 +20,10 @@ class ListTimeHandler(private val tasklist: List<TaskModel>) : HttpHandler {
         val workFlowWithTasks = WorkFlowWithTasks(tasklist)
         val listTimeSerializer = ListTimeSerializer()
 
-        //TODO handle page.toInt(), recordsPerPage.toInt()
         try{
-            val listTime = pagination(workFlowWithTasks.getListTime(tasklist, LocalDateTime.parse(time ?: throw IllegalArgumentException("Параметр time обязательный"), DateTimeFormatter.ISO_DATE_TIME)), page.toInt(), recordsPerPage.toInt())
+            if(page.toIntOrNull() == null){throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")}
+            if(recordsPerPage.toIntOrNull() == null) {throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")}
+            val listTime = pagination(workFlowWithTasks.getListTime(tasklist, LocalDateTime.parse(time ?: throw IllegalArgumentException("Некорректное значение параметры time. Ожидается дата и время в формате ISO, но получена пустая строка"), DateTimeFormatter.ISO_DATE_TIME)), page.toInt(), recordsPerPage.toInt())
             return Response(Status.OK).body(listTimeSerializer.listTimeSerialize(listTime))
         }catch (e: IllegalArgumentException){
             return Response(Status.BAD_REQUEST).body(listTimeSerializer.serializeError(e.message.toString()))
