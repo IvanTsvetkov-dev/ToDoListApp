@@ -20,13 +20,15 @@ import java.util.*
 class TaskShowHandler(private val tasklist: List<TaskModel>,
     private val userList: List<User>) : HttpHandler{
     override fun invoke(request: Request) : Response {
-        val taskId : String = request.path("task-id") ?: return Response(Status.NOT_FOUND)
+        val taskId : String = request.path("task-id") ?: return Response(Status.BAD_REQUEST)
 
         //создание класса предметной области
         val workFlowWithTasks = WorkFlowWithTasks(tasklist)
         val workFlowWithUsers = WorkFlowWithUsers(userList)
 
         val taskShowSerializer = TaskShowSerializer()
+
+        //TODO handle /v1/task/ -> 400 "error": "Отсутствует обязательный параметр task-id"
         try {
             val uuid = UUID.fromString(taskId)
             val task = workFlowWithTasks.getTaskById(uuid)
@@ -35,7 +37,7 @@ class TaskShowHandler(private val tasklist: List<TaskModel>,
         }catch (e: NullPointerException){
             return Response(Status.NOT_FOUND).body(taskShowSerializer.serializeNotFoundTask(taskId, e.message.toString()))
         }catch (e: IllegalArgumentException){
-            return Response(Status.BAD_REQUEST).body(taskShowSerializer.serializeError("Некорректный идентификатор задачи. Для параметра task-id ожидается UUID, но получено значение $taskId"))
+            return Response(Status.BAD_REQUEST).body(taskShowSerializer.serializeError("Некорректный идентификатор задачи. Для параметра task-id ожидается UUID, но получено значение «$taskId»"))
         }
     }
 }
