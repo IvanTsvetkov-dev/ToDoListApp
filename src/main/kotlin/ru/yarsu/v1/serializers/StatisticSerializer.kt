@@ -24,20 +24,17 @@ class StatisticSerializer : BaseSerializer() {
                 ValuesStatistic.END -> "statisticByEndDateTime"
             })
 
-            writeStartArray()
-
+            writeStartObject()
             for (day in listOf(
                 "Понедельник", "Вторник", "Среда", "Четверг",
                 "Пятница", "Суббота", "Воскресенье", "Не заполнено"
             )) {
                 dayCount[day]?.let { count ->
-                    writeStartObject()
                     writeFieldName(day)
                     writeNumber(count)
-                    writeEndObject()
                 }
             }
-            writeEndArray()
+            writeEndObject()
 
             writeEndObject()
             close()

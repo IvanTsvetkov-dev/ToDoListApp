@@ -21,7 +21,7 @@ class StatisticHandler(private val tasklist: List<TaskModel>) : HttpHandler {
 
         //TODO handle page.toInt(), recordsPerPage.toInt()
         try{
-            val listStatistic = workFlowWithTasks.getStatisticDate(parseValuesStatistic(byDate ?: throw IllegalArgumentException("Некорректное значение типа статистики. Для параметра by-date ожидается значение типа статистики, но получено пустое значение")))
+            val listStatistic = workFlowWithTasks.getStatisticDate(parseValuesStatistic(byDate ?: throw IllegalArgumentException("Отсутствует параметр by-date")))
             return Response(Status.OK).body(statisticSerializer.statisticSerializer(listStatistic, parseValuesStatistic(byDate)))
         }catch (e: IllegalArgumentException){
             return Response(Status.BAD_REQUEST).body(statisticSerializer.serializeError(e.message.toString()))
