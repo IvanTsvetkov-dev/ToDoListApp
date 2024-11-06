@@ -1,6 +1,7 @@
 package ru.yarsu.v1.handler
 
 import org.http4k.core.*
+import org.http4k.lens.contentType
 import ru.yarsu.TaskModel
 import ru.yarsu.TasksForListCommand
 import ru.yarsu.WorkFlowWithTasks
@@ -20,9 +21,13 @@ class TaskListHandler(private val taskList: List<TaskModel>) : HttpHandler{
             if(page.toIntOrNull() == null){throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")}
             if(recordsPerPage.toIntOrNull() == null) {throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")}
             val result: List<TasksForListCommand> = pagination(workFlowWithTasks.getSortedTaskList(), page.toInt(), recordsPerPage.toInt())
-            return Response(Status.OK).body(taskListSerializer.taskList(result))
+            return Response(Status.OK)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(taskListSerializer.taskList(result))
         } catch (e: IllegalArgumentException){
-            return Response(Status.BAD_REQUEST).body(taskListSerializer.serializeError(e.message.toString()))
+            return Response(Status.BAD_REQUEST)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(taskListSerializer.serializeError(e.message.toString()))
         }
     }
 }

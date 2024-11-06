@@ -1,6 +1,7 @@
 package ru.yarsu.v1.handler
 
 import org.http4k.core.*
+import org.http4k.lens.contentType
 import ru.yarsu.TaskModel
 import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.pagination
@@ -22,9 +23,13 @@ class StatisticHandler(private val tasklist: List<TaskModel>) : HttpHandler {
         //TODO handle page.toInt(), recordsPerPage.toInt()
         try{
             val listStatistic = workFlowWithTasks.getStatisticDate(parseValuesStatistic(byDate ?: throw IllegalArgumentException("Отсутствует параметр by-date")))
-            return Response(Status.OK).body(statisticSerializer.statisticSerializer(listStatistic, parseValuesStatistic(byDate)))
+            return Response(Status.OK)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(statisticSerializer.statisticSerializer(listStatistic, parseValuesStatistic(byDate)))
         }catch (e: IllegalArgumentException){
-            return Response(Status.BAD_REQUEST).body(statisticSerializer.serializeError(e.message.toString()))
+            return Response(Status.BAD_REQUEST)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(statisticSerializer.serializeError(e.message.toString()))
         }
     }
 }

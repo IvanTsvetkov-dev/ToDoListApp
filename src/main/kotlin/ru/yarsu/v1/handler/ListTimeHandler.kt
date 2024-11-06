@@ -1,6 +1,7 @@
 package ru.yarsu.v1.handler
 
 import org.http4k.core.*
+import org.http4k.lens.contentType
 import ru.yarsu.TaskModel
 import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.pagination
@@ -24,11 +25,17 @@ class ListTimeHandler(private val tasklist: List<TaskModel>) : HttpHandler {
             if(page.toIntOrNull() == null){throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")}
             if(recordsPerPage.toIntOrNull() == null) {throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")}
             val listTime = pagination(workFlowWithTasks.getListTime(tasklist, LocalDateTime.parse(time ?: throw IllegalArgumentException("Некорректное значение параметры time. Ожидается дата и время в формате ISO, но получена пустая строка"), DateTimeFormatter.ISO_DATE_TIME)), page.toInt(), recordsPerPage.toInt())
-            return Response(Status.OK).body(listTimeSerializer.listTimeSerialize(listTime))
+            return Response(Status.OK)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(listTimeSerializer.listTimeSerialize(listTime))
         }catch (e: IllegalArgumentException){
-            return Response(Status.BAD_REQUEST).body(listTimeSerializer.serializeError(e.message.toString()))
+            return Response(Status.BAD_REQUEST)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(listTimeSerializer.serializeError(e.message.toString()))
         }catch (e: DateTimeParseException){
-            return Response(Status.BAD_REQUEST).body(listTimeSerializer.serializeError("Неправильный формат параметра time. Ожидался формат в ISO, а получен $time"))
+            return Response(Status.BAD_REQUEST)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(listTimeSerializer.serializeError("Неправильный формат параметра time. Ожидался формат в ISO, а получен $time"))
         }
 
     }

@@ -1,6 +1,7 @@
 package ru.yarsu.v1.handler
 
 import org.http4k.core.*
+import org.http4k.lens.contentType
 import ru.yarsu.TaskModel
 import ru.yarsu.User
 import ru.yarsu.WorkFlowWithTasks
@@ -25,9 +26,13 @@ class EisenhowerListHandler(private val tasklist: List<TaskModel>) : HttpHandler
             if(page.toIntOrNull() == null){throw IllegalArgumentException("Некорректное значение параметра page. Ожидается натуральное число, но получено $page")}
             if(recordsPerPage.toIntOrNull() == null) {throw IllegalArgumentException("Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage")}
             val listEisenHower = pagination(workFlowWithTasks.getListEisenHower(if (important == null) null else important.toBoolean(), if (urgent == null) null else urgent.toBoolean()), page.toInt(), recordsPerPage.toInt())
-            return Response(Status.OK).body(eisenHowerListSerializer.eisenHowerList(listEisenHower))
+            return Response(Status.OK)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(eisenHowerListSerializer.eisenHowerList(listEisenHower))
         }catch (e: IllegalArgumentException){
-            return Response(Status.BAD_REQUEST).body(eisenHowerListSerializer.serializeError(e.message.toString()))
+            return Response(Status.BAD_REQUEST)
+                .contentType(ContentType.APPLICATION_JSON)
+                .body(eisenHowerListSerializer.serializeError(e.message.toString()))
         }
 
 
