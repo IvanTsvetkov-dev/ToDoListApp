@@ -7,25 +7,25 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import java.io.StringWriter
 
 open class BaseSerializer {
-    fun serializeError(textError: String): String{
-            val stringWriter = StringWriter()
-            val factory = JsonFactory()
-            val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
-            val printer = DefaultPrettyPrinter()
-            printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-            outputGenerator.prettyPrinter = printer
+    fun serializeError(textError: String): String {
+        val stringWriter = StringWriter()
+        val factory = JsonFactory()
+        val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
+        val printer = DefaultPrettyPrinter()
+        printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+        outputGenerator.prettyPrinter = printer
 
-            with(outputGenerator){
-                writeStartObject()
+        with(outputGenerator) {
+            writeStartObject()
 
-                writeFieldName("error")
+            writeFieldName("error")
 
-                writeString(textError)
+            writeString(textError)
 
-                writeEndObject()
+            writeEndObject()
 
-                close()
-            }
+            close()
+        }
         return stringWriter.toString()
     }
 }

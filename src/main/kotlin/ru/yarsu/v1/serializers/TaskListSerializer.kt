@@ -8,13 +8,14 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import ru.yarsu.TasksForListCommand
 import java.io.StringWriter
 
-class TaskListSerializer: BaseSerializer(){
-    fun taskList(taskList: List<TasksForListCommand>) : String{
+class TaskListSerializer : BaseSerializer() {
+    fun taskList(taskList: List<TasksForListCommand>): String {
         val stringWriter = StringWriter()
         val mapper = jacksonObjectMapper()
         val printer = DefaultPrettyPrinter()
         printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-        mapper.enable(SerializationFeature.INDENT_OUTPUT)
+        mapper
+            .enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .writer(printer)
             .writeValue(stringWriter, taskList)

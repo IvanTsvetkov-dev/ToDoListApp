@@ -1,24 +1,23 @@
 package ru.yarsu
 
 import com.beust.jcommander.*
-import java.util.*
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
-import java.io.File
-import java.time.LocalDateTime
-import java.time.format.*
-import kotlin.system.exitProcess
-
 import org.http4k.server.Netty
 import org.http4k.server.asServer
 import ru.yarsu.v1.applicationRoutes
-
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.*
+import java.util.*
+import kotlin.system.exitProcess
 
 fun main(argv: Array<String>) {
     val args = Args()
-    val commander: JCommander = JCommander
-        .newBuilder()
-        .addObject(args)
-        .build()
+    val commander: JCommander =
+        JCommander
+            .newBuilder()
+            .addObject(args)
+            .build()
     try {
         val data: List<List<String>>
 
@@ -28,18 +27,18 @@ fun main(argv: Array<String>) {
 
         val pathToUsersFile = args.userFile ?: throw ParameterException("Error: missing option --users-file")
 
-        //TODO handle uncorrect arg : --tasks-file --users-file --port
+        // TODO handle uncorrect arg : --tasks-file --users-file --port
 
         val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
 
         val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
-
-    } catch (e: Exception){
+    } catch (e: Exception) {
         System.err.println("$e")
         exitProcess(1)
     }
 }
-fun readTaskFileCsv(pathToTasksFile : String) : List<TaskModel>{
+
+fun readTaskFileCsv(pathToTasksFile: String): List<TaskModel> {
     val csvReader = CsvReader()
     val data = csvReader.readAll(File(pathToTasksFile))
 
@@ -56,27 +55,27 @@ fun readTaskFileCsv(pathToTasksFile : String) : List<TaskModel>{
                 urgency = item[6].toBoolean(),
                 percentage = item[7].toInt(),
                 description = item[8],
-                UUID.fromString(item[9])
-            )
+                UUID.fromString(item[9]),
+            ),
         )
     }
     return dataTask
 }
-fun readUserFileCsv(pathToTasksFile: String) : List<User>{
+
+fun readUserFileCsv(pathToTasksFile: String): List<User> {
     val csvReader = CsvReader()
     val data = csvReader.readAll(File(pathToTasksFile))
 
     val dataOfUsers = mutableListOf<User>()
 
-    for(item in data.drop(1)){
+    for (item in data.drop(1)) {
         dataOfUsers.add(
             User(
                 UUID.fromString(item[0]),
                 item[1],
                 LocalDateTime.parse(item[2], DateTimeFormatter.ISO_DATE_TIME).toString(),
-                item[3]
-
-            )
+                item[3],
+            ),
         )
     }
     return dataOfUsers

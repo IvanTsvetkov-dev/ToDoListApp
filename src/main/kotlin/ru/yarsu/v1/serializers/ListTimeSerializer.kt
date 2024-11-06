@@ -9,12 +9,13 @@ import ru.yarsu.TaskForListImportance
 import java.io.StringWriter
 
 class ListTimeSerializer : BaseSerializer() {
-    fun listTimeSerialize(list: List<TaskForListImportance>) : String{
+    fun listTimeSerialize(list: List<TaskForListImportance>): String {
         val stringWriter = StringWriter()
         val mapper = jacksonObjectMapper()
         val printer = DefaultPrettyPrinter()
         printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-        mapper.enable(SerializationFeature.INDENT_OUTPUT)
+        mapper
+            .enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .writer(printer)
             .writeValue(stringWriter, list)

@@ -1,36 +1,43 @@
 package ru.yarsu
-import com.beust.jcommander.*;
-import java.time.LocalDateTime
+import com.beust.jcommander.*
 
 @Parameters()
 open class Args {
-    @Parameter(names = ["--tasks-file"],
+    @Parameter(
+        names = ["--tasks-file"],
         required = true,
-        description = "Обязательный аргумент, принимает путь к csv файлу с данными")
+        description = "Обязательный аргумент, принимает путь к csv файлу с данными",
+    )
     var urlFile: String? = null
-    @Parameter(names = ["--users-file"],
+
+    @Parameter(
+        names = ["--users-file"],
         required = true,
-        description = "Имя файла с пользователями приложения")
+        description = "Имя файла с пользователями приложения",
+    )
     var userFile: String? = null
-    @Parameter(names = ["--port"],
+
+    @Parameter(
+        names = ["--port"],
         required = true,
-        description = "Порт, по которому доступен веб-сервер")
+        description = "Порт, по которому доступен веб-сервер",
+    )
     var numberPort: Int? = null
 }
 
-//@Parameters(separators = "=", commandDescription = "Выводит информацию о задаче по её UUID")
-//class ShowTask : Args(){
+// @Parameters(separators = "=", commandDescription = "Выводит информацию о задаче по её UUID")
+// class ShowTask : Args(){
 //    @Parameter(names = ["--task-id"],
 //        arity = 1,
 //        description = "Полная информация о задаче в формате JSON"
 //    )
 //    var taskID: String? = null
-//}
+// }
 //
-//class TaskList : Args() {}
+// class TaskList : Args() {}
 //
-//@Parameters(separators = "=", commandDescription = "Получить список задач для блока Матрицы Эйзенхауэра")
-//class ListEisenHower : Args() {
+// @Parameters(separators = "=", commandDescription = "Получить список задач для блока Матрицы Эйзенхауэра")
+// class ListEisenHower : Args() {
 //    @Parameter(names = ["--important"],
 //        arity = 1,
 //        description = "true – задачи с приоритетом «высокий», «очень высокий», «критический» false – задачи с приоритетом «очень низкий», «низкий», «обычный»"
@@ -42,35 +49,34 @@ open class Args {
 //        description = "Необязательный параметр срочности."
 //        )
 //    var urgent: Boolean? = null
-//}
+// }
 //
-//@Parameters(separators = "=", commandDescription = "Получить список задач, актуальных на момент времени")
-//class ListTime : Args() {
+// @Parameters(separators = "=", commandDescription = "Получить список задач, актуальных на момент времени")
+// class ListTime : Args() {
 //    @Parameter(names = ["--time"],
 //        arity = 1,
 //        description = "Обязательный параметр даты и времени в формате ISO",
 //        required = true
 //    )
 //    var time: String? = null
-//}
+// }
 //
-//@Parameters(separators = "=", commandDescription = "Получить статистическую информацию о списке задач по дням недели")
-//class Statistic : Args() {
+// @Parameters(separators = "=", commandDescription = "Получить статистическую информацию о списке задач по дням недели")
+// class Statistic : Args() {
 //    @Parameter(names = ["--by-date"],
 //        arity = 1,
 //        description = "Обязательный параметр типа отображаемой статистики",
 //        required = true
 //    )
 //    var valueStatistic: String? = null
-//}
+// }
 //
-//@Parameters(separators = "=", commandDescription = "Статистика в формате JSON содержащая пункты.")
-//class StatisticByHowReady{
+// @Parameters(separators = "=", commandDescription = "Статистика в формате JSON содержащая пункты.")
+// class StatisticByHowReady{
 //    @Parameter(names = ["--tasks-for-statistic-file"],
 //        arity = 1,
 //        description = "Путь к файлу",
 //        required = true
 //    )
 //    var statisticByHowReadyFile: String = ""
-//}
-
+// }

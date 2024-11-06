@@ -8,7 +8,10 @@ import ru.yarsu.ValuesStatistic
 import java.io.StringWriter
 
 class StatisticSerializer : BaseSerializer() {
-    fun statisticSerializer(dayCount: Map<String, Int>,typeStatistic: ValuesStatistic) : String{
+    fun statisticSerializer(
+        dayCount: Map<String, Int>,
+        typeStatistic: ValuesStatistic,
+    ): String {
         val stringWriter = StringWriter()
         val factory = JsonFactory()
         val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
@@ -18,16 +21,24 @@ class StatisticSerializer : BaseSerializer() {
         with(outputGenerator) {
             writeStartObject()
 
-            writeFieldName(when(typeStatistic){
-                ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
-                ValuesStatistic.START -> "statisticByStartDateTime"
-                ValuesStatistic.END -> "statisticByEndDateTime"
-            })
+            writeFieldName(
+                when (typeStatistic) {
+                    ValuesStatistic.REGISTRATION -> "statisticByRegistrationDateTime"
+                    ValuesStatistic.START -> "statisticByStartDateTime"
+                    ValuesStatistic.END -> "statisticByEndDateTime"
+                },
+            )
 
             writeStartObject()
             for (day in listOf(
-                "Понедельник", "Вторник", "Среда", "Четверг",
-                "Пятница", "Суббота", "Воскресенье", "Не заполнено"
+                "Понедельник",
+                "Вторник",
+                "Среда",
+                "Четверг",
+                "Пятница",
+                "Суббота",
+                "Воскресенье",
+                "Не заполнено",
             )) {
                 dayCount[day]?.let { count ->
                     writeFieldName(day)

@@ -5,11 +5,13 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import ru.yarsu.TaskModel
-import ru.yarsu.User
 import java.io.StringWriter
 
-class TaskShowSerializer: BaseSerializer() {
-    fun serializeeTask(taskById: TaskModel, authorEmail: String?) : String{
+class TaskShowSerializer : BaseSerializer() {
+    fun serializeeTask(
+        taskById: TaskModel,
+        authorEmail: String?,
+    ): String {
         val stringWriter = StringWriter()
         val factory = JsonFactory()
         val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
@@ -17,7 +19,7 @@ class TaskShowSerializer: BaseSerializer() {
         printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
         outputGenerator.prettyPrinter = printer
 
-        with(outputGenerator){
+        with(outputGenerator) {
             writeStartObject()
 
             writeFieldName("Id")
@@ -33,9 +35,9 @@ class TaskShowSerializer: BaseSerializer() {
             writeString(taskById.startDateTime.toString())
 
             writeFieldName("EndDateTime")
-            if(taskById.endDateTime == null){
+            if (taskById.endDateTime == null) {
                 writeNull()
-            }else{
+            } else {
                 writeString(taskById.endDateTime.toString())
             }
 
@@ -62,7 +64,11 @@ class TaskShowSerializer: BaseSerializer() {
         }
         return stringWriter.toString()
     }
-    fun serializeNotFoundTask(taskId: String, errorMessage: String) : String{
+
+    fun serializeNotFoundTask(
+        taskId: String,
+        errorMessage: String,
+    ): String {
         val stringWriter = StringWriter()
         val factory = JsonFactory()
         val outputGenerator: JsonGenerator = factory.createGenerator(stringWriter)
@@ -70,7 +76,7 @@ class TaskShowSerializer: BaseSerializer() {
         printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
         outputGenerator.prettyPrinter = printer
 
-        with(outputGenerator){
+        with(outputGenerator) {
             writeStartObject()
 
             writeFieldName("task-id")
