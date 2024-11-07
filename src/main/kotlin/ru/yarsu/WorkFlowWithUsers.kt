@@ -1,6 +1,6 @@
 package ru.yarsu
 
-import java.util.*
+import java.util.UUID
 
 class WorkFlowWithUsers(
     private val usersData: List<User>,

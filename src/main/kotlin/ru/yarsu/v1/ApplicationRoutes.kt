@@ -6,16 +6,21 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import ru.yarsu.TaskModel
 import ru.yarsu.User
-import ru.yarsu.v1.handler.*
+import ru.yarsu.v1.handler.EisenhowerListHandler
+import ru.yarsu.v1.handler.ListTimeHandler
+import ru.yarsu.v1.handler.PingHandler
+import ru.yarsu.v1.handler.StatisticHandler
+import ru.yarsu.v1.handler.TaskHandler
+import ru.yarsu.v1.handler.TaskListHandler
+import ru.yarsu.v1.handler.TaskShowHandler
 
 fun applicationRoutes(
     taskList: List<TaskModel>,
     userList: List<User>,
 ): RoutingHttpHandler {
-    // routes является http обработчиком типа RoutingHttpHandler.
     val app =
-        routes( // bind возвращает PathMethod,связывая "uri" с http методом,
-            "/ping" bind Method.GET to PingHandler(), // связывает строку с методом по его обработке
+        routes(
+            "/ping" bind Method.GET to PingHandler(),
             "/v1" bind
                 routes(
                     "/list-tasks" bind Method.GET to TaskListHandler(taskList),

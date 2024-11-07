@@ -10,21 +10,23 @@ fun <T> pagination(
     }
     if (recordsPerPage !in listOf(5, 10, 20, 50)) {
         throw IllegalArgumentException(
-            "Некорректное значение параметра records-per-page. Ожидается 5 10 20 50, но получено $recordsPerPage",
+            "Некорректное значение параметра records-per-page.Ожидалось enum 5, 10, 20, 50, но получено $recordsPerPage",
         )
     }
 
-    val startIndex = recordsPerPage * (page - 1)
+    val totalPaginateList = mutableListOf<T>()
 
-    val totalList = mutableListOf<T>()
+    val startIndex = (page - 1) * recordsPerPage
 
     var totalRecordsPerPage = recordsPerPage
+
     for (i in list.drop(startIndex)) {
         totalRecordsPerPage -= 1
-        totalList.add(i)
+        totalPaginateList.add(i)
         if (totalRecordsPerPage == 0) {
             break
         }
     }
-    return totalList
+
+    return totalPaginateList
 }

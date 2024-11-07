@@ -1,5 +1,7 @@
 package ru.yarsu
-import com.beust.jcommander.*
+
+import com.beust.jcommander.Parameter
+import com.beust.jcommander.Parameters
 
 @Parameters()
 open class Args {

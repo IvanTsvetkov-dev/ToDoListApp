@@ -1,6 +1,10 @@
 package ru.yarsu.v1.handler
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.lens.contentType
 import org.http4k.routing.path
 import ru.yarsu.TaskModel
@@ -9,7 +13,7 @@ import ru.yarsu.WorkFlowWithTasks
 import ru.yarsu.WorkFlowWithUsers
 import ru.yarsu.v1.serializers.BaseSerializer
 import ru.yarsu.v1.serializers.TaskShowSerializer
-import java.util.*
+import java.util.UUID
 
 class TaskShowHandler(
     private val tasklist: List<TaskModel>,
@@ -24,7 +28,6 @@ class TaskShowHandler(
 
         val taskShowSerializer = TaskShowSerializer()
 
-        // TODO handle /v1/task/ -> 400 "error": "Отсутствует обязательный параметр task-id"
         try {
             val uuid = UUID.fromString(taskId)
             val task = workFlowWithTasks.getTaskById(uuid)
@@ -47,12 +50,12 @@ class TaskShowHandler(
         }
     }
 }
-class TaskHandler : HttpHandler{
+
+class TaskHandler : HttpHandler {
     override fun invoke(request: Request): Response {
         val baseSerializer = BaseSerializer()
         return Response(Status.BAD_REQUEST)
             .contentType(ContentType.APPLICATION_JSON)
             .body(baseSerializer.serializeError("Отсутствует обязательный параметр task-id"))
     }
-
 }

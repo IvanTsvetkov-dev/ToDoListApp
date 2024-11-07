@@ -1,6 +1,12 @@
 package ru.yarsu.v1.handler
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.findSingle
+import org.http4k.core.queries
 import org.http4k.lens.contentType
 import ru.yarsu.TaskModel
 import ru.yarsu.WorkFlowWithTasks
@@ -17,7 +23,6 @@ class StatisticHandler(
         val workFlowWithTasks = WorkFlowWithTasks(tasklist)
         val statisticSerializer = StatisticSerializer()
 
-        // TODO handle page.toInt(), recordsPerPage.toInt()
         try {
             val listStatistic =
                 workFlowWithTasks.getStatisticDate(
