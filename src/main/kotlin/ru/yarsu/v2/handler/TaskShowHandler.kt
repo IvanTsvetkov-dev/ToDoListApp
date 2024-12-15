@@ -61,6 +61,7 @@ class TaskShowHandler(
 class TaskShowPutHandler(
     private val tasklist: MutableList<TaskModel>,
     private val userList: MutableList<User>,
+    private val categoriesList: MutableList<Categories>,
 ) : HttpHandler {
     override fun invoke(request: Request): Response {
         val taskId: String = request.path("task-id") ?: return Response(Status.BAD_REQUEST)
@@ -68,7 +69,7 @@ class TaskShowPutHandler(
         try {
             val body = jsonBodyLens(request)
 
-            val listError = validateBody(body, userList)
+            val listError = validateBody(body, userList, categoriesList)
 
             if (listError.isNotEmpty()) {
                 return jsonResponse.invoke(listError, Status.BAD_REQUEST)

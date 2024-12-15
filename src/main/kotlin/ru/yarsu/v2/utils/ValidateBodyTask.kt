@@ -11,6 +11,7 @@ import java.util.UUID
 fun validateBody(
     data: Map<String, Any>,
     userList: MutableList<User>,
+    categoryList: MutableList<Categories>,
 ): Map<String, Map<String, Any?>> {
     val errors = mutableMapOf<String, Map<String, Any?>>()
 
@@ -83,16 +84,26 @@ fun validateBody(
     } else {
         if (!isValidUUID(author)) {
             errors["Author"] = mutableMapOf("Value" to data["Author"], "Error" to "Ожидается корректное значение UUID")
+        } else {
+            val user = userList.firstOrNull({ UUID.fromString(author) == it.id })
+            if (user == null) {
+                errors["Author"] = mutableMapOf("Value" to data["Author"], "Error" to "Ожидается корректное значение UUID")
+            }
         }
     }
 
     val category = data["Category"]
     if (category != null) {
         if (!isValidUUID(category.toString())) {
-            errors["Category"] = mutableMapOf("Value" to category, "Error" to "Ожидается корректный UUID")
+            errors["Category"] = mutableMapOf("Value" to category, "Error" to "Ожидается корректное значение UUID")
+        } else {
+            val categoryEx = categoryList.firstOrNull({ it.id == UUID.fromString(category.toString()) })
+            if (categoryEx == null) {
+                errors["Category"] = mutableMapOf("Value" to null, "Error" to "Ожидается корректное значение UUID")
+            }
         }
     } else {
-        errors["Category"] = mutableMapOf("Value" to null, "Error" to "Ожидается значение UUID")
+        errors["Category"] = mutableMapOf("Value" to null, "Error" to "Ожидается корректное значение UUID")
     }
 
     return errors

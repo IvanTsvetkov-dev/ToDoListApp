@@ -36,7 +36,7 @@ fun applicationRoutes(
                     "/tasks/by-time" bind Method.GET to ListTimeHandler(taskList),
                     "/tasks/statistics" bind Method.GET to StatisticHandler(taskList),
                     "/tasks/{task-id}" bind Method.GET to TaskShowHandler(taskList, userList, categoriesList),
-                    "/tasks/{task-id}" bind Method.PUT to TaskShowPutHandler(taskList, userList),
+                    "/tasks/{task-id}" bind Method.PUT to TaskShowPutHandler(taskList, userList, categoriesList),
                     "/categories" bind Method.GET to CategoriesHandler(categoriesList, userList),
                     "/categories/{category-id}" bind Method.PUT to EditCategory(taskList, categoriesList, userList),
                     "/users" bind Method.GET to UserShowHandler(userList),

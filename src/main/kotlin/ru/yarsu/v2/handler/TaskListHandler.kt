@@ -72,7 +72,7 @@ class AddNewTaskHandler(
         try {
             val body = jsonBodyLens(request)
 
-            val listError = validateBody(body, userList)
+            val listError = validateBody(body, userList, categoryList)
 
             if (listError.isNotEmpty()) {
                 return jsonResponse.invoke(listError, Status.BAD_REQUEST)
