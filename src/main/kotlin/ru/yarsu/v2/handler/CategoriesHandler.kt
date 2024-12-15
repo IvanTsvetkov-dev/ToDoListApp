@@ -1,6 +1,9 @@
 package ru.yarsu.v2.handler
 
-import org.http4k.core.*
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.body.form
 import org.http4k.routing.path
 import ru.yarsu.Categories
@@ -10,7 +13,7 @@ import ru.yarsu.WorkFlowWithCategories
 import ru.yarsu.v2.jsonResponseLens
 import ru.yarsu.v2.utils.putCategory
 import ru.yarsu.v2.utils.validateBodyCategory
-import java.util.*
+import java.util.UUID
 
 class CategoriesHandler(
     private val categoriesList: List<Categories>,

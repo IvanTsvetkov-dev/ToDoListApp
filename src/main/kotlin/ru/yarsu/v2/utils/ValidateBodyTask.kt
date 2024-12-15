@@ -6,7 +6,7 @@ import ru.yarsu.User
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.util.*
+import java.util.UUID
 
 fun validateBody(
     data: Map<String, Any>,

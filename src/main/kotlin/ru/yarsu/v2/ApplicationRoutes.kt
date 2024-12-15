@@ -10,7 +10,15 @@ import ru.yarsu.User
 import ru.yarsu.v1.handler.EisenhowerListHandler
 import ru.yarsu.v1.handler.ListTimeHandler
 import ru.yarsu.v1.handler.StatisticHandler
-import ru.yarsu.v2.handler.*
+import ru.yarsu.v2.handler.AddNewTaskHandler
+import ru.yarsu.v2.handler.CategoriesHandler
+import ru.yarsu.v2.handler.EditCategory
+import ru.yarsu.v2.handler.PingHandler
+import ru.yarsu.v2.handler.TaskListHandler
+import ru.yarsu.v2.handler.TaskShowHandler
+import ru.yarsu.v2.handler.TaskShowPutHandler
+import ru.yarsu.v2.handler.UserShowHandler
+import ru.yarsu.v2.handler.UsersHandler
 
 fun applicationRoutes(
     taskList: MutableList<TaskModel>,

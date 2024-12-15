@@ -13,7 +13,7 @@ fun createErrorLog(
 
     val tasks = mutableListOf<MutableMap<String, String>>()
 
-    val sortedListTasks = taskList.sortedWith(compareBy<TaskModel> { it.id})
+    val sortedListTasks = taskList.sortedWith(compareBy<TaskModel> { it.id })
     for (task in sortedListTasks) {
         if (task.author == userUUID) {
             tasks.add(mutableMapOf("Id" to task.id.toString(), "Title" to task.title))
@@ -23,10 +23,12 @@ fun createErrorLog(
     // Сбор категорий
     val categories = mutableListOf<MutableMap<String, String>>()
 
-    val sortedList = categoriesList.sortedWith(compareBy<Categories> { it.id})
+    val sortedList = categoriesList.sortedWith(compareBy<Categories> { it.id })
 
     for (category in sortedList) {
-        categories.add(mutableMapOf("Id" to category.id.toString(), "Description" to category.description))
+        if (category.owner == userUUID) {
+            categories.add(mutableMapOf("Id" to category.id.toString(), "Description" to category.description))
+        }
     }
 
     // Добавление собранных данных в итоговую карту ошибок

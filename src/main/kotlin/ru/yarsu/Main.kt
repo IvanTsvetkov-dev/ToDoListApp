@@ -3,6 +3,7 @@ package ru.yarsu
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import org.http4k.server.Netty
 import org.http4k.server.asServer
 import ru.yarsu.v2.applicationRoutes
@@ -30,21 +31,102 @@ fun main(argv: Array<String>) {
 
         val pathToCategoriesFile = args.categoriesFile ?: throw ParameterException("Error: missing opton --categories-file")
 
-        var taskFile = readTaskFileCsv(pathToTasksFile)
+        var tasksFile = readTaskFileCsv(pathToTasksFile)
 
-        val app = applicationRoutes(taskFile, readUserFileCsv(pathToUsersFile), readCategoriesFileCsv(pathToCategoriesFile))
+        var usersFile = readUserFileCsv(pathToUsersFile)
 
-//        Runtime.getRuntime().addShutdownHook(object : Thread() {
-//            override fun run() {
-//                super.run()
-//                saveTaskToCsv(taskFile, pathToTasksFile)
-//            }
-//        })
+        var categoriesFile = readCategoriesFileCsv(pathToCategoriesFile)
+
+        val app = applicationRoutes(tasksFile, usersFile, categoriesFile)
+
+        Runtime.getRuntime().addShutdownHook(
+            object : Thread() {
+                override fun run() {
+                    super.run()
+                    writeTasksToCsv(tasksFile, pathToTasksFile)
+                    writeUsersToCsv(usersFile, pathToUsersFile)
+                    writeCategoriesToCsv(categoriesFile, pathToCategoriesFile)
+                }
+            },
+        )
 
         app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
     } catch (e: Exception) {
         System.err.println("$e")
         exitProcess(1)
+    }
+}
+
+fun writeCategoriesToCsv(
+    categories: List<Categories>,
+    filePath: String,
+) {
+    csvWriter().open(filePath) {
+        writeRow("Id", "Description", "Color", "Owner")
+
+        categories.forEach { category ->
+            writeRow(
+                category.id.toString(),
+                category.description,
+                category.color,
+                category.owner?.toString(), // Обрабатываем возможный null
+            )
+        }
+    }
+}
+
+fun writeUsersToCsv(
+    users: List<User>,
+    filePath: String,
+) {
+    csvWriter().open(filePath) {
+        writeRow("Id", "Login", "RegistrationDateTime", "Email")
+
+        users.forEach { user ->
+            writeRow(
+                user.id.toString(),
+                user.login,
+                user.registrationDateTime,
+                user.email,
+            )
+        }
+    }
+}
+
+fun writeTasksToCsv(
+    tasks: List<TaskModel>,
+    filePath: String,
+) {
+    csvWriter().open(filePath) {
+        writeRow(
+            "Id",
+            "Title",
+            "RegistrationDateTime",
+            "StartDateTime",
+            "EndDateTime",
+            "Importance",
+            "Urgency",
+            "Percentage",
+            "Description",
+            "Author",
+            "Category",
+        )
+
+        tasks.forEach { task ->
+            writeRow(
+                task.id.toString(),
+                task.title,
+                task.registrationDateTime.toString(),
+                task.startDateTime.toString(),
+                task.endDateTime?.toString(), // Можно использовать ? чтобы обработать null
+                task.importance,
+                task.urgency,
+                task.percentage,
+                task.description,
+                task.author.toString(),
+                task.category.toString(),
+            )
+        }
     }
 }
 

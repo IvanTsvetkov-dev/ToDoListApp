@@ -3,7 +3,7 @@ package ru.yarsu.v2.utils
 import ru.yarsu.Categories
 import ru.yarsu.TaskModel
 import ru.yarsu.User
-import java.util.*
+import java.util.UUID
 
 fun validateBodyCategory(
     description: String?,
