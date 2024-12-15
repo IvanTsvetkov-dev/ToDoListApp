@@ -5,5 +5,11 @@ import java.util.UUID
 class WorkFlowWithUsers(
     private val usersData: List<User>,
 ) {
-    fun getUserByUUIDAuthor(uuid: UUID): User? = usersData.find { it.id == uuid }
+    fun getUserByUUID(uuid: UUID): User {
+        val userBy = usersData.find { it.id == uuid }
+        if (userBy == null) {
+            throw NullPointerException("Пользователь не найден")
+        }
+        return userBy
+    }
 }

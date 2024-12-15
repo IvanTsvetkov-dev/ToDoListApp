@@ -52,8 +52,8 @@ class WorkFlowWithTasks(
                 .filter { task ->
                     (
                         important == null ||
-                            (important && task.importance.importance in importantStatusTask) ||
-                            (!important && task.importance.importance in unimportantStatusTask)
+                            (important && task.importance in importantStatusTask) ||
+                            (!important && task.importance in unimportantStatusTask)
                     ) &&
                         (urgent == null || ((urgent && task.urgency == urgent) || (!urgent && task.urgency == urgent)))
                 }.sortedWith(
@@ -67,7 +67,7 @@ class WorkFlowWithTasks(
                 TaskForListImportance(
                     id = task.id,
                     title = task.title,
-                    importance = task.importance.importance,
+                    importance = task.importance,
                     urgency = task.urgency,
                     percentage = task.percentage,
                 ),
@@ -85,7 +85,7 @@ class WorkFlowWithTasks(
                 .filter { task ->
                     (task.startDateTime < inputDateTime) && (task.percentage < 100)
                 }.sortedWith(
-                    compareByDescending<TaskModel> { it.importance.ordinal }
+                    compareByDescending<TaskModel> { getImportanceRank(it.importance) }
                         .thenByDescending { it.urgency }
                         .thenBy { it.registrationDateTime }
                         .thenBy { it.id },
@@ -97,7 +97,7 @@ class WorkFlowWithTasks(
                 TaskForListImportance(
                     id = task.id,
                     title = task.title,
-                    importance = task.importance.importance,
+                    importance = task.importance,
                     urgency = task.urgency,
                     percentage = task.percentage,
                 ),

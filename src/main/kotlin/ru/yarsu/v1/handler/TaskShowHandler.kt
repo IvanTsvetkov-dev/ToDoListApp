@@ -31,10 +31,10 @@ class TaskShowHandler(
         try {
             val uuid = UUID.fromString(taskId)
             val task = workFlowWithTasks.getTaskById(uuid)
-            val user = workFlowWithUsers.getUserByUUIDAuthor(task.author)
+            val user = workFlowWithUsers.getUserByUUID(task.author)
             return Response(Status.OK)
                 .contentType(ContentType.APPLICATION_JSON)
-                .body(taskShowSerializer.serializeeTask(task, user?.email))
+                .body(taskShowSerializer.serializeeTask(task, user.email))
         } catch (e: NullPointerException) {
             return Response(Status.NOT_FOUND)
                 .contentType(ContentType.APPLICATION_JSON)

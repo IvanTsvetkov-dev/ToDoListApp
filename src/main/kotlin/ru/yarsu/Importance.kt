@@ -23,3 +23,14 @@ fun parseImportance(importanceString: String): Importance =
             "Неизвестный Importance. Может быть только очень низкий, низкий, обычный, высокий, очень высокий, критический",
         )
     }
+
+fun getImportanceRank(importance: String): Int =
+    when (importance) {
+        "критический" -> 6
+        "очень высокий" -> 5
+        "высокий" -> 4
+        "обычный" -> 3
+        "низкий" -> 2
+        "очень низкий" -> 1
+        else -> -1
+    }

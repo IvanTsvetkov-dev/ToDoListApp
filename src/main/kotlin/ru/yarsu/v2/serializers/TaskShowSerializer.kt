@@ -1,4 +1,4 @@
-package ru.yarsu.v1.serializers
+package ru.yarsu.v2.serializers
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
@@ -11,6 +11,7 @@ class TaskShowSerializer : BaseSerializer() {
     fun serializeeTask(
         taskById: TaskModel,
         authorEmail: String?,
+        categoryDescription: String,
     ): String {
         val stringWriter = StringWriter()
         val factory = JsonFactory()
@@ -58,6 +59,12 @@ class TaskShowSerializer : BaseSerializer() {
 
             writeFieldName("AuthorEmail")
             writeString(authorEmail)
+
+            writeFieldName("Category")
+            writeString(taskById.category.toString())
+
+            writeFieldName("CategoryDescription")
+            writeString(categoryDescription)
 
             writeEndObject()
             close()

@@ -5,7 +5,7 @@ import com.beust.jcommander.ParameterException
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import org.http4k.server.Netty
 import org.http4k.server.asServer
-import ru.yarsu.v1.applicationRoutes
+import ru.yarsu.v2.applicationRoutes
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -28,18 +28,27 @@ fun main(argv: Array<String>) {
 
         val pathToUsersFile = args.userFile ?: throw ParameterException("Error: missing option --users-file")
 
-        // TODO handle uncorrect arg : --tasks-file --users-file --port
+        val pathToCategoriesFile = args.categoriesFile ?: throw ParameterException("Error: missing opton --categories-file")
 
-        val app = applicationRoutes(readTaskFileCsv(pathToTasksFile), readUserFileCsv(pathToUsersFile))
+        var taskFile = readTaskFileCsv(pathToTasksFile)
 
-        val server = app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
+        val app = applicationRoutes(taskFile, readUserFileCsv(pathToUsersFile), readCategoriesFileCsv(pathToCategoriesFile))
+
+//        Runtime.getRuntime().addShutdownHook(object : Thread() {
+//            override fun run() {
+//                super.run()
+//                saveTaskToCsv(taskFile, pathToTasksFile)
+//            }
+//        })
+
+        app.asServer(Netty(args.numberPort ?: throw ParameterException("Error: missing option --port"))).start()
     } catch (e: Exception) {
         System.err.println("$e")
         exitProcess(1)
     }
 }
 
-fun readTaskFileCsv(pathToTasksFile: String): List<TaskModel> {
+fun readTaskFileCsv(pathToTasksFile: String): MutableList<TaskModel> {
     val csvReader = CsvReader()
     val data = csvReader.readAll(File(pathToTasksFile))
 
@@ -52,20 +61,21 @@ fun readTaskFileCsv(pathToTasksFile: String): List<TaskModel> {
                 registrationDateTime = LocalDateTime.parse(item[2], DateTimeFormatter.ISO_DATE_TIME),
                 startDateTime = LocalDateTime.parse(item[3]),
                 endDateTime = if (item[4] == "") null else LocalDateTime.parse(item[4]),
-                importance = parseImportance(item[5]),
+                importance = item[5],
                 urgency = item[6].toBoolean(),
                 percentage = item[7].toInt(),
                 description = item[8],
                 UUID.fromString(item[9]),
+                UUID.fromString(item[10]),
             ),
         )
     }
     return dataTask
 }
 
-fun readUserFileCsv(pathToTasksFile: String): List<User> {
+fun readUserFileCsv(pathToUserFile: String): MutableList<User> {
     val csvReader = CsvReader()
-    val data = csvReader.readAll(File(pathToTasksFile))
+    val data = csvReader.readAll(File(pathToUserFile))
 
     val dataOfUsers = mutableListOf<User>()
 
@@ -81,10 +91,88 @@ fun readUserFileCsv(pathToTasksFile: String): List<User> {
     }
     return dataOfUsers
 }
-//    val mapper = jacksonObjectMapper()
-//    val printer = DefaultPrettyPrinter()
-//    printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-//    mapper.enable(SerializationFeature.INDENT_OUTPUT)
-//        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-//        .writer(printer)
-//        .writeValue(System.out, dataForView)
+
+fun readCategoriesFileCsv(pathToCategoriesFile: String): MutableList<Categories> {
+    val csvReader = CsvReader()
+    val data = csvReader.readAll(File(pathToCategoriesFile))
+
+    val dataOfCategories = mutableListOf<Categories>()
+
+    for (item in data.drop(1)) {
+        dataOfCategories.add(
+            Categories(
+                UUID.fromString(item[0]),
+                item[1],
+                item[2],
+                try {
+                    UUID.fromString(item[3])
+                } catch (e: IllegalArgumentException) {
+                    null
+                },
+            ),
+        )
+    }
+    return dataOfCategories
+}
+
+// fun saveTaskToCsv(
+//    tasks: Collection<TaskModel>,
+//    filePath: String
+// ) {
+//    val file = File(filePath)
+//    val existingIds = mutableSetOf<String>()
+//
+//
+//    if (file.exists() && file.length() > 0) {
+//        file.readLines().forEach { line ->
+//            val columns = line.split(",")
+//            if (columns.isNotEmpty()) {
+//                existingIds.add(columns[0])
+//            }
+//        }
+//    }
+//
+//    csvWriter().open(file, append = true) {
+//
+//        if (file.length() > 0) {
+//            writeRow("")
+//        }
+//
+//
+//        if (file.length() == 0L) {
+//            writeRow(
+//                "Id",
+//                "Title",
+//                "RegistrationDateTime",
+//                "StartDateTime",
+//                "EndDateTime",
+//                "Importance",
+//                "Urgency",
+//                "Percentage",
+//                "Description",
+//                "Author",
+//                "Category"
+//            )
+//        }
+//
+//
+//        for (task in tasks) {
+//            if (!existingIds.contains(task.id.toString())) {
+//                writeRow(
+//                    task.id,
+//                    task.title,
+//                    task.registrationDateTime,
+//                    task.startDateTime,
+//                    task.endDateTime,
+//                    task.importance,
+//                    task.urgency,
+//                    task.percentage,
+//                    task.description,
+//                    task.author,
+//                    task.category
+//                )
+//            }
+//        }
+//    }
+
+// }

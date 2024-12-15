@@ -5,14 +5,25 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class User(
+    @JsonProperty("Id")
     val id: UUID,
+    @JsonProperty("Login")
     val login: String,
+    @JsonProperty("RegistrationDateTime")
     val registrationDateTime: String,
+    @JsonProperty("Email")
     val email: String,
 )
 
+data class Categories(
+    var id: UUID,
+    val description: String,
+    val color: String,
+    val owner: UUID?,
+)
+
 data class TaskModel(
-    @JsonProperty("ID")
+    @JsonProperty("Id")
     val id: UUID,
     @JsonProperty("Title")
     val title: String,
@@ -23,7 +34,7 @@ data class TaskModel(
     @JsonProperty("EndDateTime")
     val endDateTime: LocalDateTime?,
     @JsonProperty("Importance")
-    var importance: Importance,
+    var importance: String,
     @JsonProperty("Urgency")
     val urgency: Boolean,
     @JsonProperty("Percentage")
@@ -31,22 +42,11 @@ data class TaskModel(
     @JsonProperty("Description")
     val description: String,
     @JsonProperty("Author")
-    val author: UUID,
+    var author: UUID,
+    @JsonProperty("Category")
+    val category: UUID,
 )
-//    : Comparable<TaskModel> {
-//    override fun compareTo(other: TaskModel): Int {
-//        if(LocalDateTime.parse(registrationDateTime) == LocalDateTime.parse(other.registrationDateTime)){
-//            return 0;
-//        }
-//        if(LocalDateTime.parse(registrationDateTime) < LocalDateTime.parse(other.registrationDateTime)){
-//            return -1;
-//        }
-//        return 1;
-//    }
-// }
-// Other views
 
-// view's for list command
 data class TasksForListCommand(
     @JsonProperty("Id")
     val id: UUID,
@@ -54,11 +54,6 @@ data class TasksForListCommand(
     val title: String,
     @JsonProperty("IsClosed")
     val isClosed: Boolean,
-)
-
-data class TaskCommandList(
-    @JsonProperty("tasks")
-    val tasks: List<TasksForListCommand>,
 )
 
 data class TaskForListImportance(
@@ -72,12 +67,4 @@ data class TaskForListImportance(
     val urgency: Boolean,
     @JsonProperty("Percentage")
     val percentage: Int,
-)
-
-// view's for list-time
-data class TaskForListTime(
-    @JsonProperty("time")
-    val time: String,
-    @JsonProperty("tasks")
-    val tasks: List<TaskForListImportance>,
 )
